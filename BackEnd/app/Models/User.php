@@ -2,21 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'full_name',
         'email',
@@ -24,40 +19,71 @@ class User extends Authenticatable
         'is_verified',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'is_verified' => 'boolean',
-        'created_at' => 'datetime',
-        'password' => 'hashed',
     ];
+
+
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'user__roles');
+        return $this->belongsToMany(Role::class, 'user_roles');
     }
+
     public function bookings()
     {
         return $this->hasMany(Booking::class);
     }
+
     public function notifications()
     {
         return $this->hasMany(Notification::class);
     }
+
     public function hasRole($roleName)
     {
         return $this->roles()->where('name', $roleName)->exists();
+    }
+
+    public function assignRole($roleName)
+    {
+        $role = Role::where('name', $roleName)->first();
+        if ($role && !$this->hasRole($roleName)) {
+            $this->roles()->attach($role->id);
+        }
+        return $this;
+    }
+
+    public function removeRole($roleName)
+    {
+        $role = Role::where('name', $roleName)->first();
+        if ($role) {
+            $this->roles()->detach($role->id);
+        }
+        return $this;
+    }
+
+    public function isApprover()
+    {
+        return $this->hasRole('approver');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            $user->assignRole('user');
+        });
+
+        static::deleting(function ($user) {
+            $user->bookings()->delete();
+            $user->notifications()->delete();
+            $user->roles()->detach();
+        });
     }
 }

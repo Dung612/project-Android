@@ -19,8 +19,13 @@ return new class extends Migration
             $table->foreignId('room_type_id')->constrained()->onDelete('cascade');
             $table->string('location')->nullable();
             $table->integer('capacity')->nullable();
-            $table->boolean('status')->default(0);
+            $table->boolean('status')->default(true);
             $table->string('description')->nullable();
+            $table->json('images')->nullable();
+            $table->time('open_time')->nullable();
+            $table->time('close_time')->nullable();
+            $table->decimal('price', 10, 2)->nullable();
+            $table->timestamps();
         });
     }
 

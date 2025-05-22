@@ -17,9 +17,17 @@ class Room extends Model
         'capacity',
         'status',
         'description',
+        'images',
+        'open_time',
+        'close_time',
+        'price'
     ];
     protected $casts = [
         'status' => 'boolean',
+        'images' => 'array',
+        'open_time' => 'datetime',
+        'close_time' => 'datetime',
+        'price' => 'decimal:2'
     ];
      public function roomType()
     {
@@ -37,5 +45,20 @@ class Room extends Model
     {
         return $this->belongsToMany(Device::class, 'resource_items')
                   ->withPivot('quantity', 'note');
+    }
+
+    public function isAvailable($startTime, $endTime)
+    {
+        return !$this->bookings()
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->whereBetween('start_time', [$startTime, $endTime])
+                    ->orWhereBetween('end_time', [$startTime, $endTime])
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('start_time', '<=', $startTime)
+                          ->where('end_time', '>=', $endTime);
+                    });
+            })
+            ->where('status', 'approved')
+            ->exists();
     }
 }
