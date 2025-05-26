@@ -30,12 +30,12 @@ class LoginTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'message',
                 'user' => [
                     'id',
                     'full_name',
                     'email',
                     'is_verified',
+                    'roles',
                     'created_at',
                     'updated_at'
                 ],
@@ -43,12 +43,19 @@ class LoginTest extends TestCase
                 'token_type'
             ])
             ->assertJson([
-                'message' => 'Đăng nhập thành công'
+                'token_type' => 'Bearer',
+                'user' => [
+                    'email' => 'nguyenvana@example.com',
+                    'is_verified' => true
+                ]
             ]);
     }
 
     public function test_user_cannot_login_when_not_verified()
     {
+        // Set environment là production
+        $this->app['env'] = 'production';
+
         // Tạo user với is_verified = false
         $user = User::create([
             'full_name' => 'Nguyễn Văn A',
@@ -66,8 +73,12 @@ class LoginTest extends TestCase
 
         $response->assertStatus(403)
             ->assertJson([
-                'message' => 'Tài khoản chưa được xác thực'
+                'message' => 'Tài khoản chưa được xác thực',
+                'email' => 'nguyenvana@example.com'
             ]);
+
+        // Reset environment
+        $this->app['env'] = 'testing';
     }
 
     public function test_user_cannot_login_with_invalid_credentials()

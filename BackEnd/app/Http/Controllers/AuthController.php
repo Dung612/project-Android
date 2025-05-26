@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -25,52 +26,62 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Đăng ký thành công',
-            'user' => $user,
-            'token' => $token
-        ], 201);
-    }
-
-    public function login(LoginRequest $request): JsonResponse
-    {
-        $credentials = $request->validated();
-
-        // Kiểm tra thông tin đăng nhập
-        $user = User::where('email', $credentials['email'])->first();
-
-        if (!$user || !\Hash::check($credentials['password'], $user->password)) {
-            return response()->json([
-                'message' => 'Thông tin đăng nhập không chính xác'
-            ], 401);
-        }
-
-        // Kiểm tra tài khoản đã xác thực chưa
-        // Chỉ kiểm tra xác thực trong môi trường production
-        if (app()->environment('production') && !$user->is_verified) {
-            return response()->json([
-                'message' => 'Tài khoản chưa được xác thực',
-                'email' => $user->email
-            ], 403);
-        }
-
-        // Xóa token cũ nếu có
-        $user->tokens()->delete();
-        
-        // Tạo token mới
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Đăng nhập thành công',
-            'user' => $user,
+            'user' => new UserResource($user->load('roles')),
             'access_token' => $token,
-            'token_type' => 'Bearer'
+            'token_type' => 'Bearer',
         ]);
     }
 
+public function login(LoginRequest $request): JsonResponse
+{
+    $credentials = $request->validated();
+
+    // 1. Sử dụng Auth::attempt để kiểm tra và đăng nhập
+    //    Nó sẽ tự tìm user và kiểm tra password.
+    if (!Auth::attempt($credentials)) {
+        return response()->json([
+            'message' => 'Thông tin đăng nhập không chính xác'
+        ], 401);
+    }
+
+    // 2. Nếu Auth::attempt thành công, user đã được đăng nhập.
+    //    Bây giờ ta có thể lấy user bằng Auth::user().
+    $user = Auth::user();
+
+    // 3. Kiểm tra tài khoản đã xác thực chưa
+    if (app()->environment('production') && !$user->is_verified) {
+        // Nên xóa token/logout trước khi trả lỗi
+        $user->tokens()->delete();
+        Auth::logout(); // Nếu bạn có dùng session
+
+        return response()->json([
+            'message' => 'Tài khoản chưa được xác thực',
+            'email' => $user->email
+        ], 403);
+    }
+
+    // 4. Xóa token cũ và tạo token mới
+    $user->tokens()->delete();
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    // 5. Trả về response, nhớ load('roles') để lồng dữ liệu
+    return response()->json([
+        'user' => new UserResource($user->load('roles')),
+        'access_token' => $token,
+        'token_type' => 'Bearer'
+    ]);
+}
+
+    /**
+     * Logout user (Revoke the token).
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
-        
+
         return response()->json([
             'message' => 'Đăng xuất thành công'
         ]);

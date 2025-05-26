@@ -2,22 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
-    public function show(Request $request): JsonResponse
+    /**
+     * Get the authenticated user's profile information.
+     *
+     * @return \App\Http\Resources\UserResource
+     */
+    public function show()
     {
-        $user = $request->user();
-        
-        return response()->json([
-            'id' => $user->id,
-            'full_name' => $user->full_name,
-            'email' => $user->email,
-            'is_verified' => $user->is_verified,
-            'created_at' => $user->created_at,
-            'updated_at' => $user->updated_at
-        ]);
+        $user = Auth::user()->load('roles');
+        return new UserResource($user);
     }
 } 
