@@ -1,5 +1,8 @@
 package com.example.tluresourcebooker.model;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
 public class User {
     @SerializedName("id")
     private int id;
@@ -13,6 +16,9 @@ public class User {
     @SerializedName("is_verified")
     private int isVerified; // 0 hoặc 1
 
+    @SerializedName("roles")
+    private List<Role> roles;
+
     @SerializedName("created_at")
     private String createdAt;
 
@@ -20,6 +26,8 @@ public class User {
     private String updatedAt;
 
     // --- Getters and Setters ---
+    public List<Role> getRoles() { return roles; }
+    public void setRoles(List<Role> roles) { this.roles = roles; }
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getFullName() { return fullName; }
