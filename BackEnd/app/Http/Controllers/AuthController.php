@@ -22,14 +22,17 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'is_verified' => false
         ]);
+        // Có thể bạn muốn gửi email xác thực ở đây nếu is_verified là false
+        // if (!$user->is_verified) {
+        //     $user->sendEmailVerificationNotification(); // Laravel có sẵn nếu bạn đã thiết lập
+        // }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'user' => new UserResource($user->load('roles')),
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
+            'message' => 'Đăng ký thành công. Vui lòng đăng nhập để tiếp tục.'
+            // Hoặc nếu có bước xác thực email:
+            // 'message' => 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản trước khi đăng nhập.'
+        ], 201);
     }
 
 public function login(LoginRequest $request): JsonResponse

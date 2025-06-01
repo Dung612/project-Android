@@ -14,7 +14,7 @@ public class User {
     private String email;
 
     @SerializedName("is_verified")
-    private int isVerified; // 0 hoặc 1
+    private boolean isVerified; // 0 hoặc 1
 
     @SerializedName("roles")
     private List<Role> roles;
@@ -34,8 +34,8 @@ public class User {
     public void setFullName(String fullName) { this.fullName = fullName; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-    public boolean isVerified() { return isVerified == 1; }
-    public void setIsVerified(int isVerified) { this.isVerified = isVerified; }
+    public boolean isVerified() { return isVerified == true; }
+    public void setIsVerified(boolean isVerified) { this.isVerified = isVerified; }
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
     public String getUpdatedAt() { return updatedAt; }

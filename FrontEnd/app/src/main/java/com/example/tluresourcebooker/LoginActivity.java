@@ -37,6 +37,8 @@ public class LoginActivity extends AppCompatActivity {
     private ImageView imageViewLogo;
     private ProgressBar progressBarLogin; // Khai báo ProgressBar
 
+    private Button buttonGoToRegister;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         editTextAccount = findViewById(R.id.editTextAccount);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
+        buttonGoToRegister = findViewById(R.id.buttonRegister);
 
         // Giả sử bạn đã thêm ProgressBar vào activity_login.xml với id "progressBarLogin"
         // Ví dụ: <ProgressBar android:id="@+id/progressBarLogin" ... />
@@ -64,6 +67,16 @@ public class LoginActivity extends AppCompatActivity {
                 handleLogin();
             }
         });
+
+        if (buttonGoToRegister != null) {
+            buttonGoToRegister.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     /**

@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.util.concurrent.TimeUnit;
 
 public class ApiClient {
-    public static final String BASE_URL = "http://127.0.0.1:8000/";
+    public static final String BASE_URL = "http://192.168.0.103:8000/";
 
     private static Retrofit retrofit = null; // Biến static để giữ instance duy nhất
 
