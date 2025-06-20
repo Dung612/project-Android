@@ -1,0 +1,17 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:padding="16dp"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView android:text="Chi tiết đặt phòng"
+        android:textSize="20sp" android:textStyle="bold"/>
+
+    <TextView android:text="Phòng: Phòng học 101"
+        android:layout_marginTop="12dp"/>
+    <TextView android:text="Ngày: 20/06/2025"/>
+    <TextView android:text="Thời gian: Sáng"/>
+    <TextView android:text="Thiết bị: Máy chiếu, Máy lạnh"/>
+
+    <Button android:text="Hủy lịch"
+        android:layout_marginTop="24dp" android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
