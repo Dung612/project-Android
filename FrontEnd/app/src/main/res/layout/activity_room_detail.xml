@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chi tiết phòng"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <!-- Hình ảnh phòng -->
+        <ImageView
+            android:id="@+id/iv_room_image"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_placeholder"/>
+
+        <!-- Thông tin phòng -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thông tin phòng"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/tv_room_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Phòng 101"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/tv_room_capacity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sức chứa: 30 người"/>
+
+        <TextView
+            android:id="@+id/tv_room_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tòa nhà A, Tầng 1"/>
+
+        <TextView
+            android:id="@+id/tv_room_rules"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Không ăn uống trong phòng."/>
+
+        <!-- Thiết bị trong phòng -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thiết bị trong phòng"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:textSize="18sp"/>
+
+        <!-- Ví dụ 1 thiết bị -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Máy chiếu"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Bảng trắng"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Điều hoà"/>
+
+        <!-- Chọn ngày -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chọn ngày"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:textSize="18sp"/>
+
+        <EditText
+            android:id="@+id/et_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Chọn ngày"
+            android:focusable="false"
+            android:inputType="none"
+            android:drawableEnd="@drawable/ic_calendar"
+            android:padding="12dp"
+            android:background="@drawable/bg_edittext"/>
+
+        <!-- Chọn khung giờ -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chọn khung giờ"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:textSize="18sp"/>
+
+        <RadioGroup
+            android:id="@+id/rg_time_slots"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/rb_time1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8:00 - 10:00"/>
+
+            <RadioButton
+                android:id="@+id/rb_time2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10:00 - 12:00"/>
+
+            <RadioButton
+                android:id="@+id/rb_time3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="14:00 - 16:00"/>
+        </RadioGroup>
+
+        <!-- Chọn thiết bị sử dụng -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chọn thiết bị sử dụng"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:textSize="18sp"/>
+
+        <CheckBox
+            android:id="@+id/cb_air_conditioner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Điều hoà"/>
+
+        <CheckBox
+            android:id="@+id/cb_projector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Máy chiếu"/>
+
+        <!-- Nút đặt phòng -->
+        <Button
+            android:id="@+id/btn_book_room"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Đặt phòng"
+            android:layout_marginTop="24dp"/>
+    </LinearLayout>
+
+</ScrollView>
