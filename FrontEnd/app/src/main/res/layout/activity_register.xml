@@ -155,7 +155,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="#1976D2"
+        android:backgroundTint="#457B9D"
         android:padding="12dp"
         android:text="Đăng ký"
         android:textColor="@android:color/white"

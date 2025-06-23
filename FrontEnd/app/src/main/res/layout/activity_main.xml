@@ -1,22 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="12dp"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
-    <EditText android:id="@+id/etSearch"
+    <!-- Thanh tìm kiếm -->
+    <EditText
+        android:id="@+id/etSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:hint="Tìm phòng học..."
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_search" android:padding="8dp"/>
+        android:drawableStart="@drawable/ic_search"
+        android:padding="8dp"
+        android:background="@drawable/bg_input_box"
+        android:textColor="#000000"
+        android:textSize="16sp" />
 
-    <!-- Bộ lọc và danh sách phòng học, bạn có thể dùng RecyclerView -->
-
+    <!-- Danh sách phòng -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRoomList"
-        android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="12dp" />
 
+    <!-- Menu dưới -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:menu="@menu/bottom_nav_menu"/>
+        android:background="#FFFFFF"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:labelVisibilityMode="labeled" />
 </LinearLayout>
