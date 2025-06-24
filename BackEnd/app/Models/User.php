@@ -7,16 +7,18 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'full_name',
+        'name',
         'email',
         'password',
-        'is_verified',
+        'status'
     ];
 
     protected $hidden = [
@@ -25,21 +27,22 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'is_verified' => 'boolean',
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'status' => 'boolean'
     ];
 
-
-    public function roles()
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_roles');
     }
 
-    public function bookings()
+    public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
     }
 
-    public function notifications()
+    public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class);
     }
@@ -70,11 +73,6 @@ class User extends Authenticatable
     public function isApprover()
     {
         return $this->hasRole('approver');
-    }
-
-    public function class()
-    {
-        return $this->belongsTo(\App\Models\ClassModel::class, 'class_id');
     }
 
     protected static function boot()

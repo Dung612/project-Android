@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Room extends Model
 {
@@ -16,35 +18,23 @@ class Room extends Model
         'location',
         'capacity',
         'status',
-        'description',
-        'images',
-        'open_time',
-        'close_time',
-        'price'
+        'description'
     ];
     protected $casts = [
-        'status' => 'integer',
-        'images' => 'array',
-        'open_time' => 'datetime',
-        'close_time' => 'datetime',
-        'price' => 'decimal:2'
+        'capacity' => 'integer',
+        'status' => 'boolean'
     ];
-     public function roomType()
+     public function roomType(): BelongsTo
     {
         return $this->belongsTo(RoomType::class);
     }
-    public function bookings()
+    public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
     }
-     public function resourceItems()
+     public function devices(): HasMany
     {
-        return $this->hasMany(ResourceItem::class);
-    }
-     public function devices()
-    {
-        return $this->belongsToMany(Device::class, 'resource_items')
-                  ->withPivot('quantity', 'note');
+        return $this->hasMany(Device::class);
     }
 
     public function isAvailable($startTime, $endTime)

@@ -4,55 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\RoomResource;
 use App\Models\Room;
+use App\Models\RoomType;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class RoomController extends Controller
 {
     /**
      * Lấy danh sách tất cả phòng
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
-        $query = Room::with(['roomType', 'devices']);
-
-        // Lọc theo trạng thái
-        if ($request->has('status')) {
-            $query->where('status', $request->boolean('status'));
-        }
-
-        // Lọc theo loại phòng
-        if ($request->has('room_type_id')) {
-            $query->where('room_type_id', $request->room_type_id);
-        }
-
-        // Lọc theo sức chứa
-        if ($request->has('min_capacity')) {
-            $query->where('capacity', '>=', $request->min_capacity);
-        }
-
-        $rooms = $query->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => RoomResource::collection($rooms),
-            'message' => 'Lấy danh sách phòng thành công'
-        ]);
+        $rooms = Room::with('roomType')->paginate(9);
+        $roomTypes = RoomType::all();
+        return view('rooms', compact('rooms', 'roomTypes'));
     }
 
     /**
      * Lấy thông tin chi tiết một phòng
      */
-    public function show(Room $room): JsonResponse
+    public function show($id): JsonResponse
     {
-        $room->load(['roomType', 'devices']);
-
-        return response()->json([
-            'success' => true,
-            'data' => new RoomResource($room),
-            'message' => 'Lấy thông tin phòng thành công'
-        ]);
+        try {
+            $room = Room::with('roomType')->findOrFail($id);
+            return response()->json([
+                'success' => true,
+                'data' => new RoomResource($room)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể tìm thấy phòng học'
+            ], 404);
+        }
     }
 
     /**
@@ -157,66 +143,101 @@ class RoomController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'room_type_id' => 'required|exists:room_types,id',
-            'location' => 'nullable|string|max:255',
-            'capacity' => 'nullable|integer|min:1',
-            'description' => 'nullable|string',
-            'images' => 'nullable|array',
-            'images.*' => 'string',
-            'open_time' => 'nullable|date_format:H:i:s',
-            'close_time' => 'nullable|date_format:H:i:s',
-            'price' => 'nullable|numeric|min:0',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'room_type_id' => 'required|exists:room_types,id',
+                'location' => 'required|string|max:255',
+                'capacity' => 'required|integer|min:1',
+                'status' => 'required|numeric|in:0,1',
+                'description' => 'nullable|string'
+            ]);
 
-        $room = Room::create($request->all());
+            // Convert status to boolean
+            $validated['status'] = (bool)$validated['status'];
 
-        return response()->json([
-            'success' => true,
-            'data' => new RoomResource($room),
-            'message' => 'Tạo phòng thành công'
-        ], 201);
+            \Log::info('Validated data:', $validated);
+
+            $room = Room::create($validated);
+
+            if (!$room) {
+                throw new \Exception('Không thể tạo phòng học');
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => new RoomResource($room->load('roomType')),
+                'message' => 'Thêm phòng học thành công'
+            ], 201);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error:', $e->errors());
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu không hợp lệ',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Room creation error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi thêm phòng học: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Cập nhật thông tin phòng (chỉ admin)
      */
-    public function update(Request $request, Room $room): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
-        $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'room_type_id' => 'sometimes|required|exists:room_types,id',
-            'location' => 'nullable|string|max:255',
-            'capacity' => 'nullable|integer|min:1',
-            'description' => 'nullable|string',
-            'images' => 'nullable|array',
-            'images.*' => 'string',
-            'open_time' => 'nullable|date_format:H:i:s',
-            'close_time' => 'nullable|date_format:H:i:s',
-            'price' => 'nullable|numeric|min:0',
-            'status' => 'sometimes|boolean',
-        ]);
+        try {
+            $room = Room::findOrFail($id);
 
-        $room->update($request->all());
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'room_type_id' => 'required|exists:room_types,id',
+                'location' => 'required|string|max:255',
+                'capacity' => 'required|integer|min:1',
+                'status' => 'required|numeric|in:0,1',
+                'description' => 'nullable|string'
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'data' => new RoomResource($room),
-            'message' => 'Cập nhật phòng thành công'
-        ]);
+            // Convert status to boolean
+            $validated['status'] = (bool)$validated['status'];
+
+            $room->update($validated);
+
+            return response()->json([
+                'success' => true,
+                'data' => new RoomResource($room->fresh()->load('roomType')),
+                'message' => 'Cập nhật phòng học thành công'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu không hợp lệ',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi cập nhật phòng học: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Xóa phòng (chỉ admin)
      */
-    public function destroy(Room $room): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $room = Room::findOrFail($id);
         $room->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Xóa phòng thành công'
+            'message' => 'Phòng học đã được xóa thành công'
         ]);
     }
 

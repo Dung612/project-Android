@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Danh sách phòng học - Hệ thống quản lý phòng học</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -188,7 +189,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table">
+                    <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Tên phòng</th>
@@ -196,7 +197,7 @@
                                 <th>Vị trí</th>
                                 <th>Sức chứa</th>
                                 <th>Trạng thái</th>
-                                <th>Giá</th>
+                                <th>Mô tả</th>
                                 <th>Thao tác</th>
                             </tr>
                         </thead>
@@ -212,13 +213,13 @@
                                         {{ $room->status == 'available' ? 'Có sẵn' : 'Đang bảo trì' }}
                                     </span>
                                 </td>
-                                <td>{{ number_format($room->price) }} VNĐ</td>
+                                <td>{{ $room->description }}</td>
                                 <td>
-                                    <button class="btn btn-primary btn-action" onclick="editRoom({{ $room->id }})" title="Chỉnh sửa">
-                                        <i class="fas fa-edit"></i>
+                                    <button class="btn btn-sm btn-primary" onclick="editRoom({{ $room->id }})">
+                                        <i class="fas fa-edit"></i> Sửa
                                     </button>
-                                    <button class="btn btn-danger btn-action" onclick="deleteRoom({{ $room->id }})" title="Xóa">
-                                        <i class="fas fa-trash"></i>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteRoom({{ $room->id }})">
+                                        <i class="fas fa-trash"></i> Xóa
                                     </button>
                                 </td>
                             </tr>
@@ -235,103 +236,105 @@
     </div>
 
     <!-- Add Room Modal -->
-    <div class="modal fade" id="addRoomModal" tabindex="-1">
+    <div class="modal fade" id="addRoomModal" tabindex="-1" aria-labelledby="addRoomModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Thêm phòng học mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="addRoomModalLabel">Thêm phòng học mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addRoomForm">
+                    <form id="addRoomForm" method="POST" action="/api/rooms">
+                        @csrf
                         <div class="mb-3">
-                            <label class="form-label">Tên phòng</label>
-                            <input type="text" class="form-control" name="name" required>
+                            <label for="name" class="form-label">Tên phòng</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Loại phòng</label>
-                            <select class="form-select" name="room_type_id" required>
+                            <label for="room_type_id" class="form-label">Loại phòng</label>
+                            <select class="form-select" id="room_type_id" name="room_type_id" required>
                                 @foreach($roomTypes as $type)
                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Vị trí</label>
-                            <input type="text" class="form-control" name="location" required>
+                            <label for="location" class="form-label">Vị trí</label>
+                            <input type="text" class="form-control" id="location" name="location" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Sức chứa</label>
-                            <input type="number" class="form-control" name="capacity" required>
+                            <label for="capacity" class="form-label">Sức chứa</label>
+                            <input type="number" class="form-control" id="capacity" name="capacity" required min="1">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Trạng thái</label>
-                            <select class="form-select" name="status" required>
-                                <option value="available">Có sẵn</option>
-                                <option value="maintenance">Đang bảo trì</option>
+                            <label for="status" class="form-label">Trạng thái</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="1">Có sẵn</option>
+                                <option value="0">Bảo trì</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Giá</label>
-                            <input type="number" class="form-control" name="price" value="0" required>
+                            <label for="description" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="saveRoom()">Lưu</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Edit Room Modal -->
-    <div class="modal fade" id="editRoomModal" tabindex="-1">
+    <div class="modal fade" id="editRoomModal" tabindex="-1" aria-labelledby="editRoomModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Chỉnh sửa phòng học</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="editRoomModalLabel">Chỉnh sửa phòng học</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editRoomForm">
-                        <input type="hidden" name="id">
+                        @csrf
+                        <input type="hidden" id="editRoomId" name="id">
                         <div class="mb-3">
-                            <label class="form-label">Tên phòng</label>
-                            <input type="text" class="form-control" name="name" required>
+                            <label for="editName" class="form-label">Tên phòng</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Loại phòng</label>
-                            <select class="form-select" name="room_type_id" required>
+                            <label for="editRoomTypeId" class="form-label">Loại phòng</label>
+                            <select class="form-select" id="editRoomTypeId" name="room_type_id" required>
                                 @foreach($roomTypes as $type)
                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Vị trí</label>
-                            <input type="text" class="form-control" name="location" required>
+                            <label for="editLocation" class="form-label">Vị trí</label>
+                            <input type="text" class="form-control" id="editLocation" name="location" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Sức chứa</label>
-                            <input type="number" class="form-control" name="capacity" required>
+                            <label for="editCapacity" class="form-label">Sức chứa</label>
+                            <input type="number" class="form-control" id="editCapacity" name="capacity" required min="1">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Trạng thái</label>
-                            <select class="form-select" name="status" required>
-                                <option value="available">Có sẵn</option>
-                                <option value="maintenance">Đang bảo trì</option>
+                            <label for="editStatus" class="form-label">Trạng thái</label>
+                            <select class="form-select" id="editStatus" name="status" required>
+                                <option value="1">Có sẵn</option>
+                                <option value="0">Bảo trì</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Giá</label>
-                            <input type="number" class="form-control" name="price" required>
+                            <label for="editDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="editDescription" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="updateRoom()">Cập nhật</button>
                 </div>
             </div>
         </div>
@@ -359,97 +362,147 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Thêm phòng mới
-        function saveRoom() {
-            const form = document.getElementById('addRoomForm');
-            const formData = new FormData(form);
+        // Add Room form submission
+        document.getElementById('addRoomForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
             
             fetch('/api/rooms', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify(Object.fromEntries(formData))
+                body: JSON.stringify(data)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Có lỗi xảy ra');
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    window.location.reload();
                 } else {
-                    alert('Có lỗi xảy ra: ' + data.message);
+                    alert(data.message || 'Không thể thêm phòng học');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
             });
-        }
+        });
 
-        // Lấy thông tin phòng để chỉnh sửa
+        // Edit room function
         function editRoom(id) {
             fetch(`/api/rooms/${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    const form = document.getElementById('editRoomForm');
-                    const room = data.data;
-                    
-                    form.id.value = room.id;
-                    form.name.value = room.name;
-                    form.room_type_id.value = room.room_type_id;
-                    form.location.value = room.location;
-                    form.capacity.value = room.capacity;
-                    form.status.value = room.status;
-                    form.price.value = room.price;
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Không thể tải thông tin phòng học');
+                    }
+                    return response.json();
+                })
+                .then(response => {
+                    if (response.success) {
+                        const room = response.data;
+                        console.log('Room data:', room); // Debug log
+                        
+                        // Populate form fields
+                        document.getElementById('editRoomId').value = room.id;
+                        document.getElementById('editName').value = room.name;
+                        document.getElementById('editRoomTypeId').value = room.room_type_id;
+                        document.getElementById('editLocation').value = room.location;
+                        document.getElementById('editCapacity').value = room.capacity;
+                        document.getElementById('editStatus').value = room.status ? "1" : "0";
+                        document.getElementById('editDescription').value = room.description || '';
 
-                    new bootstrap.Modal(document.getElementById('editRoomModal')).show();
+                        // Show modal
+                        new bootstrap.Modal(document.getElementById('editRoomModal')).show();
+                    } else {
+                        alert('Không thể tải thông tin phòng học');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error.message);
                 });
         }
 
-        // Cập nhật thông tin phòng
-        function updateRoom() {
-            const form = document.getElementById('editRoomForm');
-            const formData = new FormData(form);
-            const id = form.id.value;
+        // Edit Room form submission
+        document.getElementById('editRoomForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            const id = data.id;
+            delete data.id; // Remove id from the data to be sent
             
             fetch(`/api/rooms/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify(Object.fromEntries(formData))
+                body: JSON.stringify(data)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Có lỗi xảy ra');
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    window.location.reload();
                 } else {
-                    alert('Có lỗi xảy ra: ' + data.message);
+                    alert(data.message || 'Không thể cập nhật phòng học');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
             });
-        }
+        });
 
-        // Hiển thị modal xác nhận xóa
+        // Delete room function
         function deleteRoom(id) {
-            document.getElementById('deleteRoomId').value = id;
-            new bootstrap.Modal(document.getElementById('deleteRoomModal')).show();
-        }
-
-        // Xác nhận xóa phòng
-        function confirmDelete() {
-            const id = document.getElementById('deleteRoomId').value;
-            
-            fetch(`/api/rooms/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Có lỗi xảy ra: ' + data.message);
-                }
-            });
+            if (confirm('Bạn có chắc chắn muốn xóa phòng học này?')) {
+                fetch(`/api/rooms/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || 'Có lỗi xảy ra');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'Không thể xóa phòng học');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error.message);
+                });
+            }
         }
     </script>
 </body>
