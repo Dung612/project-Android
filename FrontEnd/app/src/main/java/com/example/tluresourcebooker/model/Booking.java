@@ -2,15 +2,18 @@ package com.example.tluresourcebooker.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class Booking {
     @SerializedName("id")
     private int id;
 
-    @SerializedName("user_id")
-    private int userId;
-
-    @SerializedName("room_id")
-    private int roomId;
+    @SerializedName("user")
+    private User user;
+    @SerializedName("room")
+    private Room room;
+    @SerializedName("devices")
+    private List<Device> devices;
 
     @SerializedName("start_time")
     private String startTime; // Dạng "YYYY-MM-DD HH:mm:ss"
@@ -42,10 +45,9 @@ public class Booking {
     // --- Getters and Setters ---
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
-    public int getRoomId() { return roomId; }
-    public void setRoomId(int roomId) { this.roomId = roomId; }
+    public User getUser() { return user; }
+    public Room getRoom() { return room; }
+    public List<Device> getDevices() { return devices; }
     public String getStartTime() { return startTime; }
     public void setStartTime(String startTime) { this.startTime = startTime; }
     public String getEndTime() { return endTime; }

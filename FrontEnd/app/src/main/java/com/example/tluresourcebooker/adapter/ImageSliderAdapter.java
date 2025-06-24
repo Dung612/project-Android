@@ -49,7 +49,7 @@ public class ImageSliderAdapter extends RecyclerView.Adapter<ImageSliderAdapter.
         void bind(String imageUrl) {
             Glide.with(context)
                     .load(imageUrl)
-                    .placeholder(R.color.grey_200)
+                    .placeholder(R.color.grey_200) // Bạn cần tạo màu này
                     .into(imageView);
         }
     }

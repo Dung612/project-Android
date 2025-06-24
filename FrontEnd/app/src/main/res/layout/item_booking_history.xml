@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:gravity="center_vertical"
+    android:background="@drawable/item_background_selector"> <!-- Drawable để tạo hiệu ứng khi nhấn -->
+
+    <ImageView
+        android:id="@+id/iconRoomType"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_room_placeholder" /> <!-- Icon placeholder -->
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp">
+
+        <TextView
+            android:id="@+id/textViewRoomNameHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Phòng học A101"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary"/>
+
+        <TextView
+            android:id="@+id/textViewBookingDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="14/10/2023"
+            android:textSize="14sp"
+            android:textColor="?android:attr/textColorSecondary"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/textViewBookingTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="09:00 - 11:00"
+            android:textSize="14sp"
+            android:textColor="?android:attr/textColorPrimary"/>
+
+        <TextView
+            android:id="@+id/textViewBookingStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Đã hoàn thành"
+            android:textStyle="bold"
+            tools:textColor="#4CAF50"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+</LinearLayout>

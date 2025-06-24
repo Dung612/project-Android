@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="Chi tiết phòng"
-            app:navigationIcon="@drawable/ic_arrow_back" /> <!-- Đảm bảo bạn có drawable ic_arrow_back -->
+            app:navigationIcon="@drawable/ic_arrow_back" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -37,12 +37,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:layout_marginBottom="80dp"> <!-- Khoảng trống cho nút Đặt phòng -->
+        android:layout_marginBottom="80dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
 
             <!-- Slider hình ảnh -->
             <androidx.viewpager2.widget.ViewPager2
@@ -50,9 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:background="#E0E0E0"/>
-            <!-- Bạn sẽ cần một Adapter cho ViewPager2 này -->
 
-            <!-- Các dấu chấm chỉ báo trang của slider -->
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabLayoutIndicator"
                 android:layout_width="match_parent"
@@ -76,6 +75,7 @@
             <!-- Thiết bị trong phòng -->
             <TextView
                 style="@style/SectionTitle"
+                android:id="@+id/title_devices"
                 android:text="Thiết bị trong phòng" />
 
             <com.google.android.material.chip.ChipGroup
@@ -113,7 +113,7 @@
             <TextView
                 style="@style/SectionTitle"
                 android:text="Chọn khung giờ" />
-            <TextView style="@style/SectionSubtitle" android:text="Chi chọn các khung giờ có sẵn"/>
+            <TextView style="@style/SectionSubtitle" android:text="Chỉ chọn các khung giờ có sẵn"/>
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipGroupTimeSlots"
                 style="@style/Widget.MaterialComponents.ChipGroup"
@@ -121,7 +121,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                app:singleSelection="true"/>
+                app:singleSelection="false"/>
 
             <!-- Chọn thiết bị sử dụng -->
             <TextView

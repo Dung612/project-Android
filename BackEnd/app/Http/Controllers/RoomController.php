@@ -6,6 +6,7 @@ use App\Http\Resources\RoomResource;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
 
 class RoomController extends Controller
 {
@@ -78,6 +79,76 @@ class RoomController extends Controller
             'success' => true,
             'data' => RoomResource::collection($availableRooms),
             'message' => 'Lấy danh sách phòng có sẵn thành công'
+        ]);
+    }
+
+    /**
+     * Kiểm tra các tiết học trống trong ngày của một phòng
+     */
+    public function checkAvailability(Request $request, Room $room): JsonResponse
+    {
+        $validated = $request->validate([
+            'date' => 'required|date_format:Y-m-d',
+        ]);
+
+        $date = Carbon::parse($validated['date'])->startOfDay();
+
+        // Định nghĩa 15 tiết học trong ngày
+        $periods = [];
+        // Tiết 1 bắt đầu lúc 7:00
+        $startTime = $date->copy()->setTime(7, 0, 0);
+
+        for ($i = 1; $i <= 15; $i++) {
+            $periodEnd = $startTime->copy()->addMinutes(50);
+            $periods[] = [
+                'period' => $i,
+                'start_time' => $startTime->format('H:i'),
+                'end_time' => $periodEnd->format('H:i'),
+                // Carbon instances for comparison
+                'start_datetime' => $startTime->copy(),
+                'end_datetime' => $periodEnd->copy(),
+            ];
+
+            // Mỗi tiết cách nhau 5 phút
+            $startTime->addMinutes(55);
+        }
+
+        // Lấy các lịch đặt đã được 'approved' của phòng trong ngày hôm đó
+        $bookings = $room->bookings()
+            ->where('status', 'approved')
+            ->whereDate('start_time', $date->toDateString())
+            ->get();
+
+        $availablePeriods = [];
+
+        foreach ($periods as $period) {
+            $isBooked = false;
+            foreach ($bookings as $booking) {
+                $bookingStart = Carbon::parse($booking->start_time);
+                $bookingEnd = Carbon::parse($booking->end_time);
+
+                // Điều kiện kiểm tra sự chồng chéo về thời gian
+                // (StartA < EndB) and (EndA > StartB)
+                if ($period['start_datetime'] < $bookingEnd && $period['end_datetime'] > $bookingStart) {
+                    $isBooked = true;
+                    break; 
+                }
+            }
+
+            if (!$isBooked) {
+                // Chỉ thêm thông tin cần thiết vào kết quả trả về
+                $availablePeriods[] = [
+                    'period' => $period['period'],
+                    'start_time' => $period['start_time'],
+                    'end_time' => $period['end_time'],
+                ];
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $availablePeriods,
+            'message' => 'Lấy danh sách tiết học còn trống thành công'
         ]);
     }
 

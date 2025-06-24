@@ -36,6 +36,21 @@
             android:exported="false">
 
         </activity>
+
+        <activity
+            android:name=".BookingSuccessActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".BookingHistoryActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".BookingCalendarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

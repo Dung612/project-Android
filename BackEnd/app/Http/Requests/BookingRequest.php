@@ -13,7 +13,7 @@ class BookingRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,15 @@ class BookingRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'room_id'    => 'required|exists:rooms,id',
+            'start_time' => 'required|date',
+            'end_time'   => 'required|date|after:start_time',
+            'purpose'    => 'required|string',
+            'note'       => 'nullable|string',
+            'devices'           => 'nullable|array',
+            'devices.*.device_id'  => 'required|exists:devices,id',
+            'devices.*.quantity'   => 'nullable|integer|min:1',
+            'devices.*.note'       => 'nullable|string|max:255',
         ];
     }
 }

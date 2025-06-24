@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\BookingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::prefix('rooms')->group(function () {
     Route::get('/', [RoomController::class, 'index']);
     Route::get('/available', [RoomController::class, 'available']);
+    Route::get('/{room}/availability', [RoomController::class, 'checkAvailability']);
     Route::get('/{room}', [RoomController::class, 'show']);
     
     // Admin routes (cần thêm middleware admin sau)
@@ -37,6 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    // Booking routes
+    Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store']);
+    Route::get('/bookings/history', [\App\Http\Controllers\BookingController::class, 'history']);
 });
 
 

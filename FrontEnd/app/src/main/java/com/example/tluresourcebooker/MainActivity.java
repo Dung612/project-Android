@@ -22,6 +22,7 @@ import com.example.tluresourcebooker.Network.ApiService;
 import com.example.tluresourcebooker.RoomDetailActivity;
 
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 
 import java.text.SimpleDateFormat;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements HorizontalRoomAda
     private static final String TAG = "MainActivity";
     private RecyclerView mainRecyclerView;
     private MainListAdapter mainListAdapter;
+    private BottomNavigationView bottomNavigationView;
     private List<Object> displayList = new ArrayList<>();
 
     @Override
@@ -55,7 +57,9 @@ public class MainActivity extends AppCompatActivity implements HorizontalRoomAda
         mainRecyclerView = findViewById(R.id.mainRecyclerView);
         mainListAdapter = new MainListAdapter(displayList, this);
         mainRecyclerView.setAdapter(mainListAdapter);
+        mainRecyclerView.setAdapter(mainListAdapter);
 
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
         // --- Ánh xạ nút ---
         // buttonFilterDevice = findViewById(R.id.buttonFilterDevice);
         // buttonFilterTime = findViewById(R.id.buttonFilterTime);
@@ -70,11 +74,30 @@ public class MainActivity extends AppCompatActivity implements HorizontalRoomAda
         // });
 
         fetchRooms();
-        // --- Lắng nghe kết quả từ các BottomSheet ---
         setupFragmentResultListeners();
     }
 
     private void setupFragmentResultListeners() {
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) {
+                return true; // Đang ở màn hình này rồi
+            } else if (itemId == R.id.nav_schedule) {
+                startActivity(new Intent(getApplicationContext(), BookingCalendarActivity.class));
+                overridePendingTransition(0, 0); // Tắt animation chuyển cảnh
+                return true;
+            } else if (itemId == R.id.nav_history) {
+                startActivity(new Intent(getApplicationContext(), BookingHistoryActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            } else if (itemId == R.id.nav_user) {
+                startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }
+            return false;
+        });
         // Lắng nghe kết quả từ bộ lọc thiết bị
         getSupportFragmentManager().setFragmentResultListener(DeviceFilterBottomSheet.REQUEST_KEY, this, (requestKey, bundle) -> {
             // ... (code xử lý lọc thiết bị giữ nguyên)
