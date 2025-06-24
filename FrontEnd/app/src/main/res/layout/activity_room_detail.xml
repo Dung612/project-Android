@@ -14,12 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppBarDetail"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="Chi tiết phòng"
-            app:navigationIcon="@drawable/ic_arrow_back" />
+        <!-- Đảm bảo bạn có drawable ic_arrow_back -->
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -30,7 +25,9 @@
         android:layout_height="wrap_content"
         android:text="Đặt phòng"
         android:layout_gravity="bottom"
-        android:layout_margin="16dp"/>
+        android:layout_margin="16dp"
+        android:background="#457B9D"
+         />
 
     <!-- Nội dung chính có thể cuộn -->
     <androidx.core.widget.NestedScrollView
@@ -51,8 +48,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:background="#E0E0E0"/>
+            <!-- Bạn sẽ cần một Adapter cho ViewPager2 này -->
 
+            <!-- Các dấu chấm chỉ báo trang của slider -->
             <com.google.android.material.tabs.TabLayout
+                android:contentDescription="slider ảnh"
                 android:id="@+id/tabLayoutIndicator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -113,7 +113,7 @@
             <TextView
                 style="@style/SectionTitle"
                 android:text="Chọn khung giờ" />
-            <TextView style="@style/SectionSubtitle" android:text="Chỉ chọn các khung giờ có sẵn"/>
+            <TextView style="@style/SectionSubtitle" android:text="Chi chọn các khung giờ có sẵn"/>
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipGroupTimeSlots"
                 style="@style/Widget.MaterialComponents.ChipGroup"
@@ -138,5 +138,17 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBarDetail"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_anchor="@+id/app_bar_layout"
+        app:layout_anchorGravity="center"
+        app:navigationIcon="@drawable/baseline_arrow_back_ios_24"
+        app:title="Chi tiết phòng"
+        android:background="#457B9D"
+        android:titleTextColor="@android:color/white" />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
