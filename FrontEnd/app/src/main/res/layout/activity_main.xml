@@ -19,10 +19,9 @@
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="#457B9D"
             app:title="Trang Chủ"
-            app:titleTextColor="@android:color/white"
-            android:background="?attr/colorPrimary"
-            />
+            app:titleTextColor="@android:color/white" />
         <!-- Bạn có thể thêm icon tìm kiếm vào menu của Toolbar nếu muốn -->
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -122,14 +121,14 @@
                 <com.google.android.material.button.MaterialButton
                     style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Thiết bị"
-                    app:icon="@android:drawable/ic_menu_manage"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
                     android:gravity="center"
                     android:paddingTop="12dp"
-                    android:paddingBottom="12dp"/>
+                    android:paddingBottom="12dp"
+                    android:text="Thiết bị"
+                    app:icon="@android:drawable/ic_menu_manage" />
 
                 <com.google.android.material.button.MaterialButton
                     style="?attr/materialButtonOutlinedStyle"

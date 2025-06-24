@@ -14,12 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppBarDetail"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="Chi tiết phòng"
-            app:navigationIcon="@drawable/ic_arrow_back" /> <!-- Đảm bảo bạn có drawable ic_arrow_back -->
+        <!-- Đảm bảo bạn có drawable ic_arrow_back -->
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -28,9 +23,10 @@
         android:id="@+id/buttonBookRoom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Đặt phòng"
         android:layout_gravity="bottom"
-        android:layout_margin="16dp"/>
+        android:layout_margin="16dp"
+        android:background="#457B9D"
+        android:text="Đặt phòng" />
 
     <!-- Nội dung chính có thể cuộn -->
     <androidx.core.widget.NestedScrollView
@@ -138,5 +134,14 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBarDetail"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_anchor="@+id/app_bar_layout"
+        app:layout_anchorGravity="center"
+        app:navigationIcon="@drawable/baseline_arrow_back_ios_24"
+        app:title="Chi tiết phòng" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
