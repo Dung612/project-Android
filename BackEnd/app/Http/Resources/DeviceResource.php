@@ -19,10 +19,9 @@ class DeviceResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'device_type' => new DeviceTypeResource($this->whenLoaded('deviceType')),
-            'rooms' => RoomResource::collection($this->whenLoaded('rooms')),
-            'serial_number' => $this->serial_number,
             'status' => $this->status,
             'description' => $this->description,
+            'location' => $this->location,
             'created_at' => $this->created_at ? $this->created_at->toDateTimeString() : null,
             'updated_at' => $this->updated_at ? $this->updated_at->toDateTimeString() : null,
         ];

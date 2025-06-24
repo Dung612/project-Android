@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('status')->default(0);
             $table->string('description')->nullable();
             $table->string('location', 45)->nullable();
+            $table->timestamps();
         });
     }
 

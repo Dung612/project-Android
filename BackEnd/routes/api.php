@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoomController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +18,18 @@ use App\Http\Controllers\AuthController;
 */
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+// Room routes (tạm thời bỏ authentication để test)
+Route::prefix('rooms')->group(function () {
+    Route::get('/', [RoomController::class, 'index']);
+    Route::get('/available', [RoomController::class, 'available']);
+    Route::get('/{room}', [RoomController::class, 'show']);
+    
+    // Admin routes (cần thêm middleware admin sau)
+    Route::post('/', [RoomController::class, 'store']);
+    Route::put('/{room}', [RoomController::class, 'update']);
+    Route::delete('/{room}', [RoomController::class, 'destroy']);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
