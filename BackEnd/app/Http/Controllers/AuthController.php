@@ -11,6 +11,7 @@ use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Laravel\Sanctum\HasApiTokens;
 
 class AuthController extends Controller
 {
@@ -32,51 +33,102 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function login(LoginRequest $request): JsonResponse
+    public function login(Request $request)
     {
-        $credentials = $request->validated();
+        try {
+            $credentials = $request->validate([
+                'email' => 'required|email',
+                'password' => 'required'
+            ]);
+            
+            $user = User::where('email', $credentials['email'])->first();
+            
+            if (!$user) {
+                Log::info('Đăng nhập thất bại: email không tồn tại', ['email' => $credentials['email']]);
+                return back()
+                    ->withErrors(['email' => 'Email không tồn tại trong hệ thống'])
+                    ->withInput($request->except('password'));
+            }
 
-        Log::info('Đăng nhập thử với:', $credentials);
+            if (!Hash::check($credentials['password'], $user->password)) {
+                Log::info('Đăng nhập thất bại: mật khẩu không đúng', ['email' => $credentials['email']]);
+                return back()
+                    ->withErrors(['password' => 'Mật khẩu không chính xác'])
+                    ->withInput($request->except('password'));
+            }
 
-        // ✅ Dùng Auth::attempt để check session-based credential
-        if (!Auth::attempt($credentials)) {
-            Log::warning('Đăng nhập thất bại với:', $credentials);
-            return response()->json([
-                'message' => 'Thông tin đăng nhập không chính xác'
-            ], 401);
-        }
+            if (!$user->is_verified) {
+                Log::info('Đăng nhập thất bại: tài khoản chưa được xác thực', ['email' => $credentials['email']]);
+                return back()
+                    ->withErrors(['email' => 'Tài khoản chưa được xác thực'])
+                    ->withInput($request->except('password'));
+            }
 
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-
-        // ✅ Kiểm tra đã xác thực chưa
-        if (!$user->is_verified) {
-            $user->tokens()->delete();
-            Auth::logout();
-            return response()->json([
-                'message' => 'Tài khoản chưa được xác thực',
+            Auth::login($user);
+            $request->session()->regenerate();
+            
+            Log::info('Đăng nhập thành công', [
+                'user_id' => $user->id,
                 'email' => $user->email
-            ], 403);
+            ]);
+
+            return redirect()->intended('/dashboard');
+        } catch (\Exception $e) {
+            Log::error('Lỗi đăng nhập', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()
+                ->withErrors(['email' => 'Có lỗi xảy ra, vui lòng thử lại sau'])
+                ->withInput($request->except('password'));
         }
-
-        // ✅ Xóa token cũ & tạo mới
-        $user->tokens()->delete();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'user' => new UserResource($user->load('roles')),
-            'access_token' => $token,
-            'token_type' => 'Bearer'
-        ]);
     }
 
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        try {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            Log::info('Đăng xuất thành công');
+            return redirect('/login');
+        } catch (\Exception $e) {
+            Log::error('Lỗi đăng xuất', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->withErrors(['message' => 'Có lỗi xảy ra khi đăng xuất']);
+        }
+    }
 
-        return response()->json([
-            'message' => 'Đăng xuất thành công'
-        ]);
+    public function profile(Request $request)
+    {
+        try {
+            $user = $request->user();
+            if (!$user) {
+                Log::warning('Không tìm thấy thông tin người dùng');
+                return response()->json([
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            Log::info('Lấy thông tin profile thành công', ['user_id' => $user->id]);
+            return response()->json([
+                'user' => $user->load('roles')
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Lỗi lấy thông tin profile', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'message' => 'Có lỗi xảy ra, vui lòng thử lại sau'
+            ], 500);
+        }
     }
 
     public function showLoginForm()

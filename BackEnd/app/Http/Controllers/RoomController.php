@@ -4,49 +4,77 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\RoomResource;
 use App\Models\Room;
+use App\Models\RoomType;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class RoomController extends Controller
 {
     /**
+     * Hiển thị trang danh sách phòng
+     */
+    public function showRooms()
+    {
+        $rooms = Room::with('roomType')->paginate(9);
+        $roomTypes = RoomType::all();
+        return view('rooms', compact('rooms', 'roomTypes'));
+    }
+
+    /**
      * Lấy danh sách tất cả phòng
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Room::with(['roomType', 'devices']);
+        try {
+            $query = Room::with(['roomType', 'devices']);
 
-        // Lọc theo trạng thái
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
+            // Lọc theo trạng thái
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            }
+
+            // Lọc theo loại phòng
+            if ($request->has('room_type_id')) {
+                $query->where('room_type_id', $request->room_type_id);
+            }
+
+            // Lọc theo sức chứa
+            if ($request->has('min_capacity')) {
+                $query->where('capacity', '>=', $request->min_capacity);
+            }
+
+            // Tìm kiếm theo tên phòng
+            if ($request->filled('search')) {
+                $searchTerm = $request->search;
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('name', 'like', '%' . $searchTerm . '%')
+                      ->orWhere('location', 'like', '%' . $searchTerm . '%')
+                      ->orWhere('description', 'like', '%' . $searchTerm . '%');
+                });
+            }
+
+            $perPage = $request->get('per_page', 10);
+            $rooms = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => RoomResource::collection($rooms),
+                'meta' => [
+                    'total' => $rooms->total(),
+                    'per_page' => $rooms->perPage(),
+                    'current_page' => $rooms->currentPage(),
+                    'last_page' => $rooms->lastPage(),
+                    'from' => $rooms->firstItem(),
+                    'to' => $rooms->lastItem()
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi lấy danh sách phòng',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Lọc theo loại phòng
-        if ($request->has('room_type_id')) {
-            $query->where('room_type_id', $request->room_type_id);
-        }
-
-        // Lọc theo sức chứa
-        if ($request->has('min_capacity')) {
-            $query->where('capacity', '>=', $request->min_capacity);
-        }
-
-        // Tìm kiếm theo tên phòng
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        $rooms = $query->get(); // Hiển thị tất cả phòng
-
-        return response()->json([
-            'data' => RoomResource::collection($rooms),
-            'meta' => [
-                'total' => $rooms->count(),
-                'per_page' => $rooms->count(),
-                'current_page' => 1,
-                'last_page' => 1
-            ]
-        ]);
     }
 
     /**
@@ -94,27 +122,23 @@ class RoomController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'room_type_id' => 'required|exists:room_types,id',
-            'location' => 'nullable|string|max:255',
-            'capacity' => 'nullable|integer|min:1',
-            'description' => 'nullable|string',
-            'images' => 'nullable|array',
-            'images.*' => 'string',
-            'open_time' => 'nullable|date_format:H:i:s',
-            'close_time' => 'nullable|date_format:H:i:s',
-            'price' => 'nullable|numeric|min:0',
-            'status' => 'required|integer|in:0,1,2',
+            'location' => 'required|string|max:255',
+            'capacity' => 'required|integer|min:1',
+            'status' => 'required|in:available,maintenance',
+            'open_time' => 'required|date_format:H:i',
+            'close_time' => 'required|date_format:H:i',
+            'price' => 'required|numeric|min:0'
         ]);
 
-        $room = Room::create($request->all());
+        $room = Room::create($validated);
 
         return response()->json([
             'success' => true,
-            'data' => new RoomResource($room),
-            'message' => 'Tạo phòng thành công'
-        ], 201);
+            'data' => new RoomResource($room)
+        ]);
     }
 
     /**
@@ -122,26 +146,22 @@ class RoomController extends Controller
      */
     public function update(Request $request, Room $room): JsonResponse
     {
-        $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'room_type_id' => 'sometimes|required|exists:room_types,id',
-            'location' => 'nullable|string|max:255',
-            'capacity' => 'nullable|integer|min:1',
-            'description' => 'nullable|string',
-            'images' => 'nullable|array',
-            'images.*' => 'string',
-            'open_time' => 'nullable|date_format:H:i:s',
-            'close_time' => 'nullable|date_format:H:i:s',
-            'price' => 'nullable|numeric|min:0',
-            'status' => 'sometimes|integer|in:0,1,2',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'room_type_id' => 'required|exists:room_types,id',
+            'location' => 'required|string|max:255',
+            'capacity' => 'required|integer|min:1',
+            'status' => 'required|in:available,maintenance',
+            'open_time' => 'required|date_format:H:i',
+            'close_time' => 'required|date_format:H:i',
+            'price' => 'required|numeric|min:0'
         ]);
 
-        $room->update($request->all());
+        $room->update($validated);
 
         return response()->json([
             'success' => true,
-            'data' => new RoomResource($room),
-            'message' => 'Cập nhật phòng thành công'
+            'data' => new RoomResource($room)
         ]);
     }
 
@@ -154,7 +174,7 @@ class RoomController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Xóa phòng thành công'
+            'message' => 'Phòng học đã được xóa thành công'
         ]);
     }
 

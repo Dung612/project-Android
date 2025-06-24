@@ -2,81 +2,111 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Đăng nhập</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Hệ thống quản lý phòng học</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
-            background: #f2f4f7;
+            justify-content: center;
         }
-        .login-box {
-            background: #fff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 300px;
-        }
-        input {
-            display: block;
+        .login-container {
             width: 100%;
-            margin: 10px 0;
-            padding: 10px;
-            box-sizing: border-box;
+            max-width: 400px;
+            padding: 20px;
         }
-        button {
-            padding: 10px 20px;
-            background: #007bff;
-            color: #fff;
+        .card {
             border: none;
-            cursor: pointer;
-            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        #error {
-            color: red;
-            margin-top: 10px;
+        .card-body {
+            padding: 40px;
+        }
+        .form-control {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+        .btn-primary {
+            padding: 12px;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+        .alert {
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-container img {
+            max-width: 150px;
+            height: auto;
         }
     </style>
 </head>
-<body>
-    <div class="login-box">
-        <img src="/images/logoTLU.png" alt="Logo" style="width: 150px;">
-        <h2>Quản trị viên TLU RB</h2>
-        <form onsubmit="login(event)">
-            <input type="email" id="email" placeholder="TÀI KHOẢN" required>
-            <input type="password" id="password" placeholder="MẬT KHẨU" required>
-            <button type="submit">Xác Nhận</button>
-            <p id="error"></p>
-        </form>
+<body class="bg-light">
+    <div class="login-container">
+        <div class="card">
+            <div class="card-body">
+                <div class="logo-container">
+                    <img src="/images/logoTLU.png" alt="Logo">
+                </div>
+                <h4 class="text-center mb-4">Đăng nhập hệ thống</h4>
+                
+                @if ($errors->any())
+                    <div class="alert alert-danger mb-4">
+                        <ul class="mb-0 list-unstyled">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+                    <div class="mb-4">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" 
+                               class="form-control @error('email') is-invalid @enderror" 
+                               id="email" 
+                               name="email" 
+                               value="{{ old('email') }}"
+                               required 
+                               autofocus>
+                        @error('email')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Mật khẩu</label>
+                        <input type="password" 
+                               class="form-control @error('password') is-invalid @enderror" 
+                               id="password" 
+                               name="password" 
+                               required>
+                        @error('password')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <script>
-        async function login(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                localStorage.setItem('token', data.access_token);
-                window.location.href = '/dashboard';
-            } else {
-                document.getElementById('error').textContent = data.message || 'Đăng nhập thất bại';
-            }
-        }
-    </script>
 </body>
 </html>

@@ -1,28 +1,40 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RoomController;
 
-// Trang login form (hiển thị HTML form + JS gọi API)
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+// Trang đăng nhập
+Route::get('/login', [AuthController::class, 'showLoginForm'])->middleware('guest')->name('login');
 
-// Dashboard page (hiển thị view Blade, JS sẽ tự fetch user qua API)
+// Xử lý đăng nhập
+Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
+
+// Đăng xuất
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+// Dashboard (chỉ cho user đã đăng nhập)
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->name('dashboard');
+})->middleware('auth');
 
-// Trang quản lý tài khoản
-Route::get('/users', function () {
-    return view('users');
-})->name('users');
+// Các trang yêu cầu đăng nhập
+Route::middleware('auth')->group(function () {
+    // Trang quản lý tài khoản
+    Route::get('/users', function () {
+        return view('users');
+    })->name('users');
 
-// Trang danh sách phòng học (chỉ trả về view, không ảnh hưởng API)
-Route::get('/rooms', function () {
-    return view('rooms');
-})->name('rooms');
+    // Trang danh sách phòng học
+    Route::get('/rooms', [RoomController::class, 'showRooms'])->name('rooms');
 
-// Trang thiết bị (chỉ trả về view, không ảnh hưởng API)
-Route::get('/devices', function () {
-    return view('devices');
+    // Trang thiết bị
+    Route::get('/devices', function () {
+        return view('devices');
+    })->name('devices');
+
+    // API lấy thông tin user
+    Route::get('/api/user', [AuthController::class, 'profile']);
 });
