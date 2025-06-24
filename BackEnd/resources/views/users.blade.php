@@ -2,284 +2,514 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Quản lý tài khoản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; background: #f2f4f7; margin: 0; padding: 0; }
-        .container { display: flex; min-height: 100vh; }
-        .sidebar { width: 220px; background: #fff; box-shadow: 2px 0 10px rgba(0,0,0,0.04); padding: 30px 0 0 0; display: flex; flex-direction: column; align-items: center; }
-        .sidebar ul { list-style: none; padding: 0; width: 100%; }
-        .sidebar li { width: 100%; margin-bottom: 18px; }
-        .sidebar a {
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .sidebar .logo {
+            padding: 0 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .sidebar .logo img {
+            max-width: 100px;
+        }
+        .nav-item {
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
             display: flex;
             align-items: center;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        .nav-item i {
+            width: 24px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        .nav-item:hover,
+        .nav-item.active {
+            background: #f0f7ff;
+            color: #0d6efd;
+            border-left-color: #0d6efd;
             text-decoration: none;
-            color: #222 !important;
-            padding: 10px 30px;
-            border-radius: 6px;
-            transition: background 0.2s;
         }
-        .sidebar a:hover, .sidebar .active {
-            background: #f2f4f7 !important;
-            color: #222 !important;
-        }
-        .sidebar svg { margin-right: 12px; }
-        .main {
+        .main-content {
             flex: 1;
-            padding: 40px 40px 0 40px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-            padding: 32px 28px;
-            margin-bottom: 40px;
+            padding: 20px;
+            background: #f5f5f5;
         }
-        .main h2 {
-            font-size: 22px;
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .page-title {
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
         }
-        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .topbar .icons { display: flex; gap: 24px; }
-        .topbar .icons svg { width: 22px; height: 22px; cursor: pointer; }
-        .page-title { font-size: 22px; font-weight: bold; margin-bottom: 24px; }
-        .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); padding: 28px 24px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-        th, td { padding: 12px 8px; text-align: left; }
-        th { color: #1a237e; font-weight: 600; border-bottom: 1px solid #e0e0e0; }
-        tr:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
-        .search-bar { display: flex; align-items: center; margin-bottom: 16px; }
-        .search-bar input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; outline: none; width: 220px; margin-right: 10px; }
-        .search-bar svg { width: 20px; height: 20px; color: #1a237e; }
-        .btn { padding: 8px 18px; border: none; border-radius: 6px; background: #1976d2; color: #fff; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        .btn:hover { background: #0d47a1; }
-        .edit-btn {
-            background: #2196f3;
-            color: #fff;
+        .page-title i {
+            margin-right: 10px;
+            color: #0d6efd;
+        }
+        .btn-add {
+            background-color: #0d6efd;
+            color: white;
             border: none;
+            padding: 8px 16px;
             border-radius: 4px;
-            width: 32px;
-            height: 32px;
+            cursor: pointer;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: bold;
-            margin-right: 6px;
-            padding: 0;
-            transition: background 0.2s;
+            gap: 8px;
         }
-        .edit-btn:hover {
-            background: #1565c0;
+        .btn-add:hover {
+            background-color: #0b5ed7;
         }
-        .delete-btn {
-            background: #e53935;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: bold;
-            padding: 0;
-            transition: background 0.2s;
-        }
-        .delete-btn:hover {
-            background: #b71c1c;
-        }
-        .pagination { display: flex; justify-content: center; align-items: center; margin-top: 18px; gap: 8px; }
-        .pagination button { border: none; background: none; font-size: 18px; cursor: pointer; color: #1976d2; }
-        .pagination .active { font-weight: bold; border-bottom: 2px solid #1976d2; }
-        .confirm-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .confirm-box { background: #fff; padding: 32px 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.12); text-align: center; }
-        .confirm-box button { margin: 0 12px; }
-        .role-list { display: flex; flex-wrap: wrap; gap: 6px; }
-        .role-tag { background: #e3e6f3; color: #1a237e; border-radius: 4px; padding: 2px 8px; font-size: 13px; }
-        .multiselect { width: 100%; min-height: 36px; border: 1px solid #ccc; border-radius: 6px; padding: 6px; background: #fff; display: flex; flex-wrap: wrap; gap: 4px; }
-        .multiselect label { margin-right: 8px; }
-        .action-btns {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-        .sidebar ul ul {
-            padding-left: 24px;
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-        .sidebar ul ul li {
-            margin-bottom: 10px;
-        }
-        .sidebar ul ul a {
-            font-size: 15px;
-            opacity: 0.95;
-            color: #222 !important;
-            background: none !important;
-            text-decoration: none !important;
-            display: block;
-            padding-left: 0;
-        }
-        .sidebar-sub .sidebar-child.active {
-            background: #e3e6f3 !important;
-            color: #1a237e !important;
-            font-weight: bold;
-        }
-        .sidebar-sub .sidebar-child {
-            padding-left: 40px;
-            font-size: 15px;
-            opacity: 0.95;
-            color: #222 !important;
-            background: none !important;
-            text-decoration: none !important;
-            display: block;
-            border-radius: 4px;
-            margin-bottom: 4px;
-            transition: background 0.2s;
-        }
-        .btn.active {
-            background: #0d47a1 !important;
-            color: #fff !important;
-            border: 1px solid #0d47a1;
-        }
-        .filter-link {
-            text-decoration: none;
-            display: inline-block;
-        }
-        /* Chuẩn hóa input/select trong modal */
-        .confirm-box input[type="text"],
-        .confirm-box input[type="email"],
-        .confirm-box input[type="password"],
-        .confirm-box select {
+        .table {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-            margin-top: 4px;
-            margin-bottom: 14px;
-            box-sizing: border-box;
-            background: #fafbfc;
-            transition: border 0.2s;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-        .confirm-box input[type="text"]:focus,
-        .confirm-box input[type="email"]:focus,
-        .confirm-box input[type="password"]:focus,
-        .confirm-box select:focus {
-            border: 1.5px solid #1976d2;
-            outline: none;
-            background: #fff;
-        }
-        .confirm-box label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 2px;
+        .table th {
+            background-color: #f8f9fa;
+            padding: 12px;
             text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            color: #495057;
         }
-        .confirm-box .btn {
-            min-width: 90px;
-            margin-left: 8px;
-            margin-right: 0;
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
         }
-        .confirm-box .btn:first-child {
-            margin-left: 0;
+        .badge-role {
+            background-color: #0d6efd;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        .confirm-box .btn:last-child {
-            margin-right: 0;
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            margin-right: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
         }
-        .confirm-box .form-row {
-            margin-bottom: 14px;
+        .btn-edit {
+            background-color: #0d6efd;
+            color: white;
         }
-        .confirm-box .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 10px;
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-edit:hover {
+            background-color: #0b5ed7;
+            color: white;
+            text-decoration: none;
+        }
+        .btn-delete:hover {
+            background-color: #bb2d3b;
+            color: white;
+            text-decoration: none;
+        }
+        .modal-content {
+            border-radius: 8px;
+        }
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 8px 8px 0 0;
+        }
+        .modal-footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            border-radius: 0 0 8px 8px;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #495057;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <nav class="sidebar">
-        <ul>
-            <li><a href="/dashboard" id="sidebar-dashboard"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M9 21V9h6v12"/></svg>Trang chủ</a></li>
-            <li><a href="/rooms" id="sidebar-rooms"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 3v4"/><path d="M8 3v4"/></svg>Phòng học</a></li>
-            <li>
-                <a href="#" id="sidebar-users" class="sidebar-parent"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>Tài khoản</a>
-            </li>
-            <li><a href="#" id="sidebar-device"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 4v16"/><path d="M16 4v16"/><path d="M4 12h16"/></svg>Thiết bị</a></li>
-            <li><a href="#" id="sidebar-settings"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>Cài đặt</a></li>
-        </ul>
-    </nav>
-    <main class="main">
-        <div class="page-title">Danh sách tài khoản</div>
-        <div class="table-container">
-            <div class="search-bar">
-                <input type="text" id="user-search" placeholder="Nhập tên hoặc email">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                <button class="btn" style="margin-left:auto;" id="add-user-btn">Thêm tài khoản</button>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="/images/logoTLU.png" alt="Logo TLU">
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Họ tên</th>
-                        <th>Email</th>
-                        <th>Vai trò</th>
-                        <th>Trạng thái</th>
-                        <th>Chỉnh sửa</th>
-                    </tr>
-                </thead>
-                <tbody id="user-table-body">
-                </tbody>
-            </table>
-            <div class="pagination" id="user-pagination"></div>
+            <a href="/dashboard" class="nav-item">
+                <i class="fas fa-home"></i>
+                Trang chủ
+            </a>
+            <a href="/rooms" class="nav-item">
+                <i class="fas fa-door-open"></i>
+                Phòng học
+            </a>
+            <a href="/users" class="nav-item active">
+                <i class="fas fa-users"></i>
+                Tài khoản
+            </a>
+            <a href="/devices" class="nav-item">
+                <i class="fas fa-desktop"></i>
+                Thiết bị
+            </a>
+            <a href="/settings" class="nav-item">
+                <i class="fas fa-cog"></i>
+                Cài đặt
+            </a>
         </div>
-        <div id="user-confirm-modal" class="confirm-modal" style="display:none;">
-            <div class="confirm-box">
-                <div style="margin-bottom:18px;font-size:17px;">Bạn có thật sự muốn xóa tài khoản không?</div>
-                <div class="form-actions" style="justify-content:center;">
-                    <button class="btn" id="user-confirm-yes">Có</button>
-                    <button class="btn" id="user-confirm-no" style="background:#e53935;">Không</button>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="container">
+                <div class="page-title">
+                    <i class="fas fa-users"></i>
+                    Danh sách tài khoản
+                </div>
+                
+                <button type="button" class="btn-add" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="fas fa-plus"></i>
+                    Thêm tài khoản
+                </button>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th>Ngày tạo</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($users as $user)
+                        <tr>
+                            <td>{{ $user->id }}</td>
+                            <td>{{ $user->full_name }}</td>
+                            <td>{{ $user->email }}</td>
+                            <td>
+                                @foreach($user->roles as $role)
+                                    <span class="badge-role">
+                                        <i class="fas fa-user-tag"></i>
+                                        {{ $role->name }}
+                                    </span>
+                                @endforeach
+                            </td>
+                            <td>{{ $user->created_at }}</td>
+                            <td>
+                                <button class="btn-action btn-edit" onclick="editUser({{ $user->id }})">
+                                    <i class="fas fa-edit"></i>
+                                    Sửa
+                                </button>
+                                <button class="btn-action btn-delete" onclick="deleteUser({{ $user->id }})">
+                                    <i class="fas fa-trash"></i>
+                                    Xóa
+                                </button>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                {{ $users->links() }}
+
+                <!-- Add User Modal -->
+                <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addUserModalLabel">
+                                    <i class="fas fa-user-plus"></i>
+                                    Thêm tài khoản mới
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addUserForm">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">
+                                            <i class="fas fa-user"></i>
+                                            Tên
+                                        </label>
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">
+                                            <i class="fas fa-envelope"></i>
+                                            Email
+                                        </label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">
+                                            <i class="fas fa-lock"></i>
+                                            Mật khẩu
+                                        </label>
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password_confirmation" class="form-label">
+                                            <i class="fas fa-lock"></i>
+                                            Xác nhận mật khẩu
+                                        </label>
+                                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            <i class="fas fa-times"></i>
+                                            Hủy
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i>
+                                            Lưu
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit User Modal -->
+                <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editUserModalLabel">
+                                    <i class="fas fa-user-edit"></i>
+                                    Sửa tài khoản
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editUserForm">
+                                    @csrf
+                                    <input type="hidden" id="edit_user_id" name="user_id">
+                                    <div class="mb-3">
+                                        <label for="edit_name" class="form-label">
+                                            <i class="fas fa-user"></i>
+                                            Tên
+                                        </label>
+                                        <input type="text" class="form-control" id="edit_name" name="name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit_email" class="form-label">
+                                            <i class="fas fa-envelope"></i>
+                                            Email
+                                        </label>
+                                        <input type="email" class="form-control" id="edit_email" name="email" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit_password" class="form-label">
+                                            <i class="fas fa-lock"></i>
+                                            Mật khẩu mới (để trống nếu không đổi)
+                                        </label>
+                                        <input type="password" class="form-control" id="edit_password" name="password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit_password_confirmation" class="form-label">
+                                            <i class="fas fa-lock"></i>
+                                            Xác nhận mật khẩu mới
+                                        </label>
+                                        <input type="password" class="form-control" id="edit_password_confirmation" name="password_confirmation">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            <i class="fas fa-times"></i>
+                                            Hủy
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i>
+                                            Lưu
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- Popup form Thêm/Sửa tài khoản -->
-        <div id="user-modal" class="confirm-modal" style="display:none;">
-            <div class="confirm-box" style="min-width:350px;">
-                <h3 id="user-modal-title">Thêm tài khoản</h3>
-                <form id="user-form">
-                    <input type="hidden" id="user-id">
-                    <div class="form-row">
-                        <label for="user-name">Họ và tên</label>
-                        <input type="text" id="user-name" placeholder="Họ và tên">
-                    </div>
-                    <div class="form-row">
-                        <label for="user-email">Email</label>
-                        <input type="email" id="user-email" placeholder="Email">
-                    </div>
-                    <div class="form-row">
-                        <label for="user-role-id">Vai trò</label>
-                        <select id="user-role-id"></select>
-                    </div>
-                    <div class="form-row">
-                        <label for="user-password">Mật khẩu</label>
-                        <input type="password" id="user-password" placeholder="Mật khẩu">
-                    </div>
-                    <div class="form-row">
-                        <label style="font-weight:400;"><input type="checkbox" id="user-verified" style="width:auto;display:inline-block;"> Đã xác thực</label>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn" id="user-save">Lưu</button>
-                        <button type="button" class="btn" id="user-cancel">Hủy</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <!-- Thông báo -->
-        <div id="user-alert-box" style="display:none;position:fixed;top:30px;right:30px;z-index:2000;padding:16px 28px;border-radius:8px;font-weight:bold;"></div>
-    </main>
-</div>
-<script src="/js/users.js"></script>
-<script>initUserEvents();</script>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add User form submission
+        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Có lỗi xảy ra');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Không thể thêm tài khoản');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
+            });
+        });
+
+        // Edit user function
+        function editUser(id) {
+            fetch(`/api/users/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('edit_user_id').value = data.user.id;
+                    document.getElementById('edit_name').value = data.user.full_name;
+                    document.getElementById('edit_email').value = data.user.email;
+                    
+                    // Clear password fields
+                    document.getElementById('edit_password').value = '';
+                    document.getElementById('edit_password_confirmation').value = '';
+                    
+                    // Show modal
+                    new bootstrap.Modal(document.getElementById('editUserModal')).show();
+                } else {
+                    alert(data.message || 'Không thể lấy thông tin tài khoản');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Không thể lấy thông tin tài khoản');
+            });
+        }
+
+        // Edit User form submission
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userId = document.getElementById('edit_user_id').value;
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Remove empty password fields from the data
+            if (!data.password) {
+                delete data.password;
+                delete data.password_confirmation;
+            }
+            
+            fetch(`/api/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Có lỗi xảy ra');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Không thể cập nhật tài khoản');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
+            });
+        });
+
+        // Delete user function
+        function deleteUser(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
+                fetch(`/api/users/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || 'Có lỗi xảy ra');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'Không thể xóa tài khoản');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error.message);
+                });
+            }
+        }
+    </script>
 </body>
 </html>

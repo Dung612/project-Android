@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,5 +46,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store']);
     Route::get('/bookings/history', [\App\Http\Controllers\BookingController::class, 'history']);
 });
+
+Route::post('/users', [UserController::class, 'store']);
+Route::get('/users/{id}', [UserController::class, 'show']);
+Route::put('/users/{id}', [UserController::class, 'update']);
+Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
 

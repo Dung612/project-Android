@@ -25,9 +25,7 @@ Route::get('/dashboard', function () {
 // Các trang yêu cầu đăng nhập
 Route::middleware('auth')->group(function () {
     // Trang quản lý tài khoản
-    Route::get('/users', function () {
-        return view('users');
-    })->name('users');
+    Route::get('/users', [UserController::class, 'index'])->name('users');
 
     // Trang danh sách phòng học
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');

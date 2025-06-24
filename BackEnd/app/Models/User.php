@@ -15,10 +15,9 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
+        'full_name',
         'email',
         'password',
-        'status'
     ];
 
     protected $hidden = [
@@ -28,11 +27,10 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'status' => 'boolean'
+        'is_verified' => 'boolean',
     ];
 
-    public function roles(): BelongsToMany
+    public function roles()
     {
         return $this->belongsToMany(Role::class, 'user_roles');
     }
