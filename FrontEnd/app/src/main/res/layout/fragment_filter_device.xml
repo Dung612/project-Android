@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background"
+    android:padding="16dp">
+    <!-- Cần tạo file drawable/bottom_sheet_background.xml -->
+
+    <!-- Tay cầm để kéo -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bottom_sheet_handle"/>
+    <!-- Cần tạo file drawable/bottom_sheet_handle.xml -->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lọc theo thiết bị"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Sử dụng ChipGroup để người dùng có thể chọn nhiều thiết bị -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupDevices"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:chipSpacingHorizontal="8dp"
+        app:selectionRequired="false"
+        app:singleSelection="false">
+
+        <!-- Bạn sẽ thêm các Chip này từ code Java/Kotlin dựa trên danh sách thiết bị
+             hoặc định nghĩa sẵn ở đây nếu danh sách là cố định -->
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipComputer"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Máy tính"
+            app:chipIcon="@android:drawable/ic_menu_camera" /> <!-- Thay icon phù hợp -->
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAirConditioner"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Điều hòa"
+            app:chipIcon="@android:drawable/ic_menu_camera"/> <!-- Thay icon phù hợp -->
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipProjector"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Máy chiếu"
+            app:chipIcon="@android:drawable/ic_menu_camera"/> <!-- Thay icon phù hợp -->
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipSpeaker"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loa TEV"
+            app:chipIcon="@android:drawable/ic_menu_camera"/> <!-- Thay icon phù hợp -->
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipMicrophone"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Micro"
+            app:chipIcon="@android:drawable/ic_menu_camera"/> <!-- Thay icon phù hợp -->
+
+    </com.google.android.material.chip.ChipGroup>
+    <!-- Các nút hành động -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonClear"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Clear"
+            android:layout_marginEnd="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonApply"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Apply"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+</LinearLayout>

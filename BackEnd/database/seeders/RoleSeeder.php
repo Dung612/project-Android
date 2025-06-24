@@ -35,10 +35,6 @@ class RoleSeeder extends Seeder
             [
                 'name' => 'maintenance',
                 'description' => 'Nhân viên bảo trì'
-            ],
-            [
-                'name' => 'teacher',
-                'description' => 'Giảng viên'
             ]
         ];
 

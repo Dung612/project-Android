@@ -1,34 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="24dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:padding="32dp">
 
-    <!-- Checkmark Icon -->
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="120dp"
+
+        android:layout_height="120dp"
+
         android:src="@drawable/ic_check_circle"
+
         android:tint="@android:color/holo_green_dark" />
 
-    <!-- Success Message -->
     <TextView
-        android:layout_marginTop="24dp"
-        android:text="Đã gửi yêu cầu thành công"
-        android:textSize="18sp"
-        android:textStyle="bold"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Đặt phòng thành công!"
+        android:textSize="22sp"
+        android:textStyle="bold"
 
-    <!-- Close Button -->
-    <Button
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="24dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Yêu cầu của bạn đã được gửi đi và đang chờ phê duyệt. Vui lòng kiểm tra thông báo."
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/textViewSuccessMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Yêu cầu của bạn đã được gửi đi và đang chờ phê duyệt. Vui lòng kiểm tra thông báo."
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginTop="8dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonBackToHome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#4A7B9D"
-        android:textColor="@android:color/white"
-        android:text="Đóng" />
+        android:text="Quay về Trang chủ"
+        android:layout_marginTop="32dp"/>
+
 </LinearLayout>

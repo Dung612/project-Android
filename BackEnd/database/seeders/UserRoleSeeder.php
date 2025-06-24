@@ -38,36 +38,6 @@ class UserRoleSeeder extends Seeder
                     }
                 }
             }
-
-            $teacherRole = $roles->where('name', 'teacher')->first();
-            $teacherUser = $users->where('email', 'teacher1@example.com')->first();
-            if ($teacherRole && $teacherUser) {
-                $exists = DB::table('user_roles')
-                    ->where('user_id', $teacherUser->id)
-                    ->where('role_id', $teacherRole->id)
-                    ->exists();
-                if (!$exists) {
-                    DB::table('user_roles')->insert([
-                        'user_id' => $teacherUser->id,
-                        'role_id' => $teacherRole->id,
-                    ]);
-                }
-            }
-
-            $adminUser = $users->where('email', 'admin@tlu.edu.vn')->first();
-            $adminRole = $roles->where('name', 'admin')->first();
-            if ($adminUser && $adminRole) {
-                $exists = DB::table('user_roles')
-                    ->where('user_id', $adminUser->id)
-                    ->where('role_id', $adminRole->id)
-                    ->exists();
-                if (!$exists) {
-                    DB::table('user_roles')->insert([
-                        'user_id' => $adminUser->id,
-                        'role_id' => $adminRole->id,
-                    ]);
-                }
-            }
         }
     }
 } 

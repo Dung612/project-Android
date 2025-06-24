@@ -1,173 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".RoomDetailActivity">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
+    <!-- Thanh tiêu đề -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Header -->
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chi tiết phòng"
-            android:textSize="20sp"
-            android:textStyle="bold"/>
+        <!-- Đảm bảo bạn có drawable ic_arrow_back -->
 
-        <!-- Hình ảnh phòng -->
-        <ImageView
-            android:id="@+id/iv_room_image"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="16dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_placeholder"/>
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- Thông tin phòng -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Thông tin phòng"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:textSize="18sp"/>
+    <!-- Nút Đặt phòng ở dưới cùng -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonBookRoom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đặt phòng"
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        android:background="#457B9D"
+         />
 
-        <TextView
-            android:id="@+id/tv_room_name"
+    <!-- Nội dung chính có thể cuộn -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_marginBottom="80dp">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Phòng 101"
-            android:layout_marginTop="8dp"/>
-
-        <TextView
-            android:id="@+id/tv_room_capacity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sức chứa: 30 người"/>
-
-        <TextView
-            android:id="@+id/tv_room_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Tòa nhà A, Tầng 1"/>
-
-        <TextView
-            android:id="@+id/tv_room_rules"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Không ăn uống trong phòng."/>
-
-        <!-- Thiết bị trong phòng -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Thiết bị trong phòng"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:textSize="18sp"/>
-
-        <!-- Ví dụ 1 thiết bị -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="• Máy chiếu"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="• Bảng trắng"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="• Điều hoà"/>
-
-        <!-- Chọn ngày -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chọn ngày"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:textSize="18sp"/>
-
-        <EditText
-            android:id="@+id/et_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Chọn ngày"
-            android:focusable="false"
-            android:inputType="none"
-            android:drawableEnd="@drawable/ic_calendar"
-            android:padding="12dp"
-            android:background="@drawable/bg_edittext"/>
-
-        <!-- Chọn khung giờ -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chọn khung giờ"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:textSize="18sp"/>
-
-        <RadioGroup
-            android:id="@+id/rg_time_slots"
             android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:paddingBottom="24dp">
 
-            <RadioButton
-                android:id="@+id/rb_time1"
-                android:layout_width="wrap_content"
+            <!-- Slider hình ảnh -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/imageViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:background="#E0E0E0"/>
+            <!-- Bạn sẽ cần một Adapter cho ViewPager2 này -->
+
+            <!-- Các dấu chấm chỉ báo trang của slider -->
+            <com.google.android.material.tabs.TabLayout
+                android:contentDescription="slider ảnh"
+                android:id="@+id/tabLayoutIndicator"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="8:00 - 10:00"/>
+                android:background="@android:color/transparent"
+                app:tabBackground="@drawable/tab_selector"
+                app:tabGravity="center"
+                app:tabIndicatorHeight="0dp"/>
 
-            <RadioButton
-                android:id="@+id/rb_time2"
-                android:layout_width="wrap_content"
+            <!-- Phần thông tin phòng -->
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Thông tin phòng" />
+
+            <include layout="@layout/item_info_row" android:id="@+id/info_room_name"/>
+            <include layout="@layout/item_info_row" android:id="@+id/info_room_type"/>
+            <include layout="@layout/item_info_row" android:id="@+id/info_room_capacity"/>
+            <include layout="@layout/item_info_row" android:id="@+id/info_room_location"/>
+            <include layout="@layout/item_info_row" android:id="@+id/info_room_rules"/>
+
+            <!-- Thiết bị trong phòng -->
+            <TextView
+                style="@style/SectionTitle"
+                android:id="@+id/title_devices"
+                android:text="Thiết bị trong phòng" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupRoomDevices"
+                style="@style/Widget.MaterialComponents.ChipGroup"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="10:00 - 12:00"/>
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"/>
 
-            <RadioButton
-                android:id="@+id/rb_time3"
-                android:layout_width="wrap_content"
+            <!-- Chọn ngày -->
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Chọn ngày" />
+
+            <!-- EditText để hiển thị ngày được chọn và mở DatePickerDialog -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="14:00 - 16:00"/>
-        </RadioGroup>
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:hint="Thời gian">
 
-        <!-- Chọn thiết bị sử dụng -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chọn thiết bị sử dụng"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:textSize="18sp"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableEnd="@drawable/ic_calendar"
+                    android:focusable="false"
+                    android:clickable="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <CheckBox
-            android:id="@+id/cb_air_conditioner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Điều hoà"/>
+            <!-- Chọn khung giờ -->
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Chọn khung giờ" />
+            <TextView style="@style/SectionSubtitle" android:text="Chi chọn các khung giờ có sẵn"/>
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupTimeSlots"
+                style="@style/Widget.MaterialComponents.ChipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:singleSelection="false"/>
 
-        <CheckBox
-            android:id="@+id/cb_projector"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Máy chiếu"/>
+            <!-- Chọn thiết bị sử dụng -->
+            <TextView
+                style="@style/SectionTitle"
+                android:text="Chọn thiết bị sử dụng" />
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupSelectableDevices"
+                style="@style/Widget.MaterialComponents.ChipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:singleSelection="false"/>
 
-        <!-- Nút đặt phòng -->
-        <Button
-            android:id="@+id/btn_book_room"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Đặt phòng"
-            android:layout_marginTop="24dp"/>
-    </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-</ScrollView>
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBarDetail"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_anchor="@+id/app_bar_layout"
+        app:layout_anchorGravity="center"
+        app:navigationIcon="@drawable/baseline_arrow_back_ios_24"
+        app:title="Chi tiết phòng"
+        android:background="#457B9D"
+        android:titleTextColor="@android:color/white" />
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('device_type_id')->constrained()->onDelete('cascade');
             $table->boolean('status')->default(0);
             $table->string('description')->nullable();
-            $table->string('location')->nullable();
+            $table->string('location', 45)->nullable();
             $table->timestamps();
         });
     }

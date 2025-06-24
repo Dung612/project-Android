@@ -2,4 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="grey_200">#EEEEEE</color>
+
+    <color name="status_completed">#4CAF50</color> <!-- Màu xanh lá -->
+    <color name="status_cancelled">#F44336</color> <!-- Màu đỏ -->
+    <color name="status_absent">#FF9800</color>   <!-- Màu cam -->
+    <color name="status_default">#757575</color>   <!-- Màu xám -->
+
 </resources>
