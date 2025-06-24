@@ -142,6 +142,9 @@
         app:layout_anchor="@+id/app_bar_layout"
         app:layout_anchorGravity="center"
         app:navigationIcon="@drawable/baseline_arrow_back_ios_24"
-        app:title="Chi tiết phòng" />
+        app:title="Chi tiết phòng"
+        android:background="#457B9D"
+        android:titleTextColor="@android:color/white" />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
