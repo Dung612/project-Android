@@ -11,31 +11,39 @@ class RoomResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
-        // Xử lý images để trả về đường dẫn đầy đủ
-        $images = [];
-        if ($this->images) {
-            // Kiểm tra xem images có phải là array không
-            if (is_array($this->images)) {
-                foreach ($this->images as $image) {
-                    $images[] = url('images/rooms/' . $image);
-                }
-            } elseif (is_string($this->images)) {
-                // Nếu là string, thử decode JSON
-                $decoded = json_decode($this->images, true);
-                if (is_array($decoded)) {
-                    foreach ($decoded as $image) {
-                        $images[] = url('images/rooms/' . $image);
-                    }
-                } else {
-                    // Nếu không phải JSON, coi như là 1 ảnh
-                    $images[] = url('images/rooms/' . $this->images);
+        // === BẮT ĐẦU LOGIC XỬ LÝ ẢNH AN TOÀN ===
+        
+        $imageData = $this->images;
+        $decodedImages = [];
+
+        // Kiểm tra xem dữ liệu nhận được có phải là một chuỗi không.
+        // Nếu đúng, thử giải mã nó như một chuỗi JSON.
+        if (is_string($imageData)) {
+            $decodedImages = json_decode($imageData, true);
+            // Nếu giải mã thất bại (không phải chuỗi JSON hợp lệ), đặt nó là mảng rỗng để tránh lỗi.
+            if (is_null($decodedImages)) {
+                $decodedImages = [];
+            }
+        } 
+        // Nếu nó đã là một mảng rồi (do $casts hoạt động đúng), thì dùng luôn.
+        elseif (is_array($imageData)) {
+            $decodedImages = $imageData;
+        }
+
+        // Tạo đường dẫn URL đầy đủ cho mỗi ảnh
+        $finalImages = [];
+        if (!empty($decodedImages)) {
+            foreach ($decodedImages as $image) {
+                if (is_string($image) && !empty($image)) {
+                    $finalImages[] = url('images/rooms/' . $image);
                 }
             }
         }
+        // === KẾT THÚC LOGIC XỬ LÝ ẢNH ===
 
         return [
             'id' => $this->id,
@@ -46,7 +54,7 @@ class RoomResource extends JsonResource
             'location' => $this->location,
             'description' => $this->description,
             'status' => $this->status,
-            'images' => $images, // Thêm trường images với đường dẫn đầy đủ
+            'images' => $finalImages, // <-- Sử dụng mảng đã được xử lý
             'open_time' => $this->open_time ? $this->open_time->format('H:i:s') : null,
             'close_time' => $this->close_time ? $this->close_time->format('H:i:s') : null,
             'price' => $this->price,

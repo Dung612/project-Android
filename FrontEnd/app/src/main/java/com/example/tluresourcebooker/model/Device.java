@@ -13,7 +13,7 @@ public class Device {
     private int deviceTypeId;
 
     @SerializedName("status")
-    private int status; // 0 hoặc 1
+    private boolean status; // 0 hoặc 1
 
     @SerializedName("description")
     private String description;
@@ -28,8 +28,8 @@ public class Device {
     public void setName(String name) { this.name = name; }
     public int getDeviceTypeId() { return deviceTypeId; }
     public void setDeviceTypeId(int deviceTypeId) { this.deviceTypeId = deviceTypeId; }
-    public boolean getStatus() { return status == 1; }
-    public void setStatus(int status) { this.status = status; }
+    public boolean getStatus() { return status; }
+    public void setStatus(boolean status) { this.status = status; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     public String getLocation() { return location; }

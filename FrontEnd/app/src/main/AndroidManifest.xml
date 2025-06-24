@@ -30,6 +30,12 @@
             android:name=".RegisterActivity"
             android:exported="false">
         </activity>
+
+        <activity
+            android:name=".RoomDetailActivity"
+            android:exported="false">
+
+        </activity>
     </application>
 
 </manifest>

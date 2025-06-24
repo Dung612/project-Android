@@ -8,11 +8,11 @@
     android:layout_height="match_parent">
 
     <!-- Checkmark Icon -->
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@drawable/ic_check_circle"
-        android:tint="@android:color/holo_green_dark" />
+<!--    <ImageView-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="100dp"-->
+<!--        android:src="@drawable/ic_check_circle"-->
+<!--        android:tint="@android:color/holo_green_dark" />-->
 
     <!-- Success Message -->
     <TextView
