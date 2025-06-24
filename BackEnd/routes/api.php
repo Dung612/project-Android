@@ -24,6 +24,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::prefix('rooms')->group(function () {
     Route::get('/', [RoomController::class, 'index']);
     Route::get('/available', [RoomController::class, 'available']);
+    Route::get('/search', [RoomController::class, 'search']);
     Route::get('/{room}/availability', [RoomController::class, 'checkAvailability']);
     Route::get('/{room}', [RoomController::class, 'show']);
     

@@ -219,4 +219,74 @@ class RoomController extends Controller
             'message' => 'Xóa phòng thành công'
         ]);
     }
+
+    /**
+     * Tìm kiếm phòng theo thời gian, thiết bị và sức chứa
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $request->validate([
+            'start_time' => 'required|date',
+            'end_time' => 'required|date|after:start_time',
+            'min_capacity' => 'nullable|integer|min:1',
+            'max_capacity' => 'nullable|integer|min:1|gte:min_capacity',
+            'device_ids' => 'nullable|array',
+            'device_ids.*' => 'exists:devices,id',
+            'room_type_id' => 'nullable|exists:room_types,id',
+        ]);
+
+        $startTime = $request->start_time;
+        $endTime = $request->end_time;
+
+        // Bắt đầu với query cơ bản
+        $query = Room::with(['roomType', 'devices'])
+            ->where('status', true);
+
+        // Lọc theo sức chứa
+        if ($request->filled('min_capacity')) {
+            $query->where('capacity', '>=', $request->min_capacity);
+        }
+
+        if ($request->filled('max_capacity')) {
+            $query->where('capacity', '<=', $request->max_capacity);
+        }
+
+        // Lọc theo loại phòng
+        if ($request->filled('room_type_id')) {
+            $query->where('room_type_id', $request->room_type_id);
+        }
+
+        // Lọc theo thiết bị
+        if ($request->filled('device_ids')) {
+            $deviceIds = $request->device_ids;
+            $query->whereHas('devices', function ($q) use ($deviceIds) {
+                $q->whereIn('devices.id', $deviceIds);
+            });
+        }
+
+        // Lấy tất cả phòng thỏa mãn điều kiện filter
+        $rooms = $query->get();
+
+        // Lọc theo thời gian có sẵn
+        $availableRooms = $rooms->filter(function ($room) use ($startTime, $endTime) {
+            return $room->isAvailable($startTime, $endTime);
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => RoomResource::collection($availableRooms),
+            'meta' => [
+                'total_rooms' => $availableRooms->count(),
+                'search_criteria' => [
+                    'start_time' => $startTime,
+                    'end_time' => $endTime,
+                    'min_capacity' => $request->min_capacity,
+                    'max_capacity' => $request->max_capacity,
+                    'device_ids' => $request->device_ids,
+                    'room_type_id' => $request->room_type_id,
+                ]
+            ],
+            'message' => 'Tìm kiếm phòng thành công'
+        ]);
+    }
 } 

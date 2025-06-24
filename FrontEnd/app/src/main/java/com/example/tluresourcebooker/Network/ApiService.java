@@ -14,6 +14,9 @@ import com.example.tluresourcebooker.model.UserResponse;
 // Import các model khác nếu bạn có các API khác
 // import com.example.tluresourcebooker.model.Room;
 
+import java.util.List;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Header;
@@ -64,14 +67,20 @@ public interface ApiService {
     @GET("api/user/profile") // Hoặc endpoint lấy thông tin user của bạn
     Call<UserResponse> getUserProfile(@Header("Authorization") String authToken);
 
+    @Headers("Accept: application/json")
+    @GET("api/rooms/search") // Sử dụng endpoint search mới
+    Call<RoomListResponse> searchRooms(
+            @Query("start_time") String startTime,     // Ví dụ: "2024-05-15 08:00:00"
+            @Query("end_time") String endTime,
+            @Query("min_capacity") Integer minCapacity,
+            @Query("device_ids[]") List<Integer> deviceIds
+            // Thêm các tham số khác như room_type_id nếu cần
+    );
 
-    // --- Ví dụ cho các API khác bạn có thể thêm sau này ---
-    // @GET("api/user")
-    // Call<User> getCurrentUser(); // Yêu cầu token trong Header (sẽ cấu hình trong ApiClient)
+    @Headers("Accept: application/json")
+    @POST("api/logout")
+    Call<ResponseBody> logout(@Header("Authorization") String authToken);
 
-    // @GET("api/rooms")
-    // Call<List<Room>> getAllRooms();
 
-    // @GET("api/rooms/{id}")
-    // Call<Room> getRoomDetails(@Path("id") int roomId);
+
 }

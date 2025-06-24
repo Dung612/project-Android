@@ -1,8 +1,11 @@
 package com.example.tluresourcebooker;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,6 +20,7 @@ import com.example.tluresourcebooker.Network.ApiClient;
 import com.example.tluresourcebooker.Network.ApiService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -129,8 +133,35 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void handleLogout() {
-        // TODO: Gọi API logout
+        // Lấy token đã lưu
+        SharedPreferences prefs = getSharedPreferences("AppPrefs_TLUBooker", MODE_PRIVATE);
+        String token = "Bearer " + prefs.getString("AUTH_TOKEN", "");
 
+        // Vô hiệu hóa nút để tránh nhấn nhiều lần
+        optionLogout.setEnabled(false);
+
+        // Gọi API logout
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<ResponseBody> call = apiService.logout(token);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                // Dù API có thành công hay không, ta đều xóa dữ liệu và chuyển màn hình
+                Toast.makeText(ProfileActivity.this, "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
+                clearLocalDataAndGoToLogin();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                // Nếu có lỗi mạng, ta vẫn xóa dữ liệu và chuyển màn hình
+                Log.e(TAG, "Logout API call failed: " + t.getMessage());
+                clearLocalDataAndGoToLogin();
+            }
+        });
+    }
+
+    private void clearLocalDataAndGoToLogin() {
         // Xóa thông tin đã lưu
         SharedPreferences prefs = getSharedPreferences("AppPrefs_TLUBooker", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
@@ -138,7 +169,7 @@ public class ProfileActivity extends AppCompatActivity {
         editor.remove("USER_ID");
         editor.apply();
 
-        // Chuyển về màn hình đăng nhập
+        // Chuyển về màn hình đăng nhập và xóa tất cả các activity cũ
         Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
