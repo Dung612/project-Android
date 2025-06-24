@@ -23,7 +23,7 @@ class Device extends Model
 
     public function deviceType()
     {
-        return $this->belongsTo(DeviceType::class);
+        return $this->belongsTo(DeviceType::class, 'device_type_id');
     }
 
     public function bookings()

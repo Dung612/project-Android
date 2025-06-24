@@ -72,6 +72,11 @@ class User extends Authenticatable
         return $this->hasRole('approver');
     }
 
+    public function class()
+    {
+        return $this->belongsTo(\App\Models\ClassModel::class, 'class_id');
+    }
+
     protected static function boot()
     {
         parent::boot();

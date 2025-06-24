@@ -10,77 +10,66 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create([
-            'full_name' => $request->full_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'is_verified' => false
+            'full_name'   => $request->full_name,
+            'email'       => $request->email,
+            'password'    => Hash::make($request->password),
+            'is_verified' => true, // ✅ Tạm TRUE để test dễ (bạn chỉnh lại sau)
         ]);
-        // Có thể bạn muốn gửi email xác thực ở đây nếu is_verified là false
-        // if (!$user->is_verified) {
-        //     $user->sendEmailVerificationNotification(); // Laravel có sẵn nếu bạn đã thiết lập
-        // }
-
 
         return response()->json([
+            'id' => $user->id,
+            'full_name' => $user->full_name,
+            'email' => $user->email,
+            'is_verified' => $user->is_verified,
             'message' => 'Đăng ký thành công. Vui lòng đăng nhập để tiếp tục.'
-            // Hoặc nếu có bước xác thực email:
-            // 'message' => 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản trước khi đăng nhập.'
         ], 201);
     }
 
-public function login(LoginRequest $request): JsonResponse
-{
-    $credentials = $request->validated();
+    public function login(LoginRequest $request): JsonResponse
+    {
+        $credentials = $request->validated();
 
-    // 1. Sử dụng Auth::attempt để kiểm tra và đăng nhập
-    //    Nó sẽ tự tìm user và kiểm tra password.
-    if (!Auth::attempt($credentials)) {
-        return response()->json([
-            'message' => 'Thông tin đăng nhập không chính xác'
-        ], 401);
-    }
+        Log::info('Đăng nhập thử với:', $credentials);
 
-    // 2. Nếu Auth::attempt thành công, user đã được đăng nhập.
-    //    Bây giờ ta có thể lấy user bằng Auth::user().
-    $user = Auth::user();
+        // ✅ Dùng Auth::attempt để check session-based credential
+        if (!Auth::attempt($credentials)) {
+            Log::warning('Đăng nhập thất bại với:', $credentials);
+            return response()->json([
+                'message' => 'Thông tin đăng nhập không chính xác'
+            ], 401);
+        }
 
-    // 3. Kiểm tra tài khoản đã xác thực chưa
-    if (app()->environment('production') && !$user->is_verified) {
-        // Nên xóa token/logout trước khi trả lỗi
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // ✅ Kiểm tra đã xác thực chưa
+        if (!$user->is_verified) {
+            $user->tokens()->delete();
+            Auth::logout();
+            return response()->json([
+                'message' => 'Tài khoản chưa được xác thực',
+                'email' => $user->email
+            ], 403);
+        }
+
+        // ✅ Xóa token cũ & tạo mới
         $user->tokens()->delete();
-        Auth::logout(); // Nếu bạn có dùng session
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Tài khoản chưa được xác thực',
-            'email' => $user->email
-        ], 403);
+            'user' => new UserResource($user->load('roles')),
+            'access_token' => $token,
+            'token_type' => 'Bearer'
+        ]);
     }
 
-    // 4. Xóa token cũ và tạo token mới
-    $user->tokens()->delete();
-    $token = $user->createToken('auth_token')->plainTextToken;
-
-    // 5. Trả về response, nhớ load('roles') để lồng dữ liệu
-    return response()->json([
-        'user' => new UserResource($user->load('roles')),
-        'access_token' => $token,
-        'token_type' => 'Bearer'
-    ]);
-}
-
-    /**
-     * Logout user (Revoke the token).
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
@@ -89,6 +78,9 @@ public function login(LoginRequest $request): JsonResponse
             'message' => 'Đăng xuất thành công'
         ]);
     }
-} 
 
-
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
+}

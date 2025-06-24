@@ -23,7 +23,7 @@ class Room extends Model
         'price'
     ];
     protected $casts = [
-        'status' => 'boolean',
+        'status' => 'integer',
         'images' => 'array',
         'open_time' => 'datetime',
         'close_time' => 'datetime',

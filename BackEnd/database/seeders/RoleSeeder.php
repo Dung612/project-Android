@@ -14,6 +14,39 @@ class RoleSeeder extends Seeder
      */
     public function run()
     {
+<<<<<<< Updated upstream
         //
+=======
+        $roles = [
+            [
+                'name' => 'admin',
+                'description' => 'Quản trị viên hệ thống'
+            ],
+            [
+                'name' => 'manager',
+                'description' => 'Quản lý phòng ban'
+            ],
+            [
+                'name' => 'user',
+                'description' => 'Người dùng thông thường'
+            ],
+            [
+                'name' => 'approver',
+                'description' => 'Người phê duyệt booking'
+            ],
+            [
+                'name' => 'maintenance',
+                'description' => 'Nhân viên bảo trì'
+            ],
+            [
+                'name' => 'teacher',
+                'description' => 'Giảng viên'
+            ]
+        ];
+
+        foreach ($roles as $role) {
+            Role::create($role);
+        }
+>>>>>>> Stashed changes
     }
 }
